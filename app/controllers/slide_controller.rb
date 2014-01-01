@@ -30,7 +30,7 @@ class SlideController < UIViewController
 
       @tilt_manager.startDeviceMotionUpdatesToQueue(queue, withHandler: device_motion_handler)
     else
-      label.text = "Nothing available. Are you in simulator?"
+      label.text = "Device Motion is unavailable in iOS simulator. Run `rake device` instead."
     end
 
   end
@@ -93,12 +93,15 @@ class SlideController < UIViewController
   def label
     @label ||= UILabel.alloc.initWithFrame(CGRectZero).tap do |l|
       l.frame = CGRect.new([20, 100], [self.view.frame.size.width - 40, 40])
+      l.font  = UIFont.systemFontOfSize(12)
+      l.numberOfLines = 0
+      l.lineBreakMode = UILineBreakModeWordWrap
     end
   end
 
   def bar
     @bar ||= UIView.alloc.initWithFrame(CGRectZero).tap do |b|
-      b.frame = CGRect.new([0, bar_position(5)], [self.view.frame.size.width, 5])
+      b.frame = CGRect.new([0, bar_position(6)], [self.view.frame.size.width, 5])
       b.backgroundColor = UIColor.blackColor
     end
   end
