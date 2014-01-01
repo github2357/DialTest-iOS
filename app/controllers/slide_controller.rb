@@ -17,7 +17,7 @@ class SlideController < UIViewController
 
     @tilt_manager = CMMotionManager.alloc.init
 
-    if @tilt_manager.isGyroAvailable
+    if @tilt_manager.isDeviceMotionAvailable
       queue = NSOperationQueue.alloc.init
 
       device_motion_handler = lambda do |motion, error|
