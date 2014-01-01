@@ -1,4 +1,6 @@
 class SlideController < UIViewController
+  attr_accessor :event
+
   MIN = 0
   MAX = 10
 
@@ -7,7 +9,7 @@ class SlideController < UIViewController
 
     self.view.backgroundColor = UIColor.whiteColor
 
-    self.title = "WHAT"
+    self.title = event[:name]
 
     build_dividers
 
@@ -82,7 +84,7 @@ class SlideController < UIViewController
       'response[value]'    => array[value.to_i][1],
       'user[api_token]'    => "1cfc0f51520db5a3f5dfebb8bd437618"
     }
-    AFMotion::Client.shared.post("events/1/responses", data) do |result|
+    AFMotion::Client.shared.post("events/#{event[:id]}/responses", data) do |result|
       parsed_string = result.object
       if result.success?
         p parsed_string

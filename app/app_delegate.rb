@@ -6,14 +6,14 @@ class AppDelegate
       response_serializer :json
     end
 
-    slide = SlideController.alloc.initWithNibName(nil, bundle: nil)
-    slide_nav_controller = UINavigationController.alloc.initWithRootViewController(slide)
+    event = EventsTableController.alloc.initWithNibName(nil, bundle: nil)
+    event_nav_controller = UINavigationController.alloc.initWithRootViewController(event)
 
     @window ||= UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
 
     @window.makeKeyAndVisible
 
-    @window.rootViewController = slide_nav_controller
+    @window.rootViewController = event_nav_controller
 
     true
   end
