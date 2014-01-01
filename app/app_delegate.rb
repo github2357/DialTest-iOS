@@ -1,5 +1,6 @@
 class AppDelegate
   def application(application, didFinishLaunchingWithOptions:launchOptions)
+    # dialtestapp.herokuapp.com
     AFMotion::Client.build_shared("http://localhost:3000/api/v1/") do
       header "Accept", "application/json"
       response_serializer :json
