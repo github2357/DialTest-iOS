@@ -100,7 +100,7 @@ class SlideController < UIViewController
 
   def bar
     @bar ||= UIView.alloc.initWithFrame(CGRectZero).tap do |b|
-      b.frame = CGRect.new([0, bar_position(11)], [self.view.frame.size.width, 5])
+      b.frame = CGRect.new([0, bar_position(5)], [self.view.frame.size.width, 5])
       b.backgroundColor = UIColor.blackColor
     end
   end
@@ -144,8 +144,8 @@ class SlideController < UIViewController
 
   def array
     @array ||= [
-      [0, 10], [1, 9], [2, 8], [3, 7], [4, 6], [5, 5],
-      [6, 4], [7, 3], [8, 2], [9, 1], [10, 0]
+      [0, 5], [1, 4], [2, 3], [3, 2], [4, 1], [5, 0],
+      [6, -1], [7, -2], [8, -3], [9, -4], [10, -5]
     ]
   end
 
