@@ -28,8 +28,6 @@ class SlideController < UIViewController
 
       @tilt_manager.deviceMotionUpdateInterval = 1.0/60.0
 
-      label.text = "About to start updates"
-
       @tilt_manager.startDeviceMotionUpdatesToQueue(queue, withHandler: device_motion_handler)
     else
       label.text = "Nothing available. Are you in simulator?"
