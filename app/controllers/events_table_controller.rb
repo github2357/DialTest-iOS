@@ -1,4 +1,4 @@
-class EventsTableController < UIViewController
+class EventsTableController < DialTestController
   def viewDidLoad
     self.title = "Events"
 
@@ -13,7 +13,7 @@ class EventsTableController < UIViewController
 
   def fetch_events
     data = {
-      'user[api_token]'    => "1cfc0f51520db5a3f5dfebb8bd437618"
+      'user[api_token]'    => api_token
     }
     AFMotion::Client.shared.get("events", data) do |result|
       if result.success?

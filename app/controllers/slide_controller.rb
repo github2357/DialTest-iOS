@@ -1,4 +1,4 @@
-class SlideController < UIViewController
+class SlideController < DialTestController
   attr_accessor :event
 
   MIN = 0
@@ -61,15 +61,6 @@ class SlideController < UIViewController
     end
   end
 
-  def slide
-    @slide ||= UISlider.alloc.initWithFrame(CGRectZero).tap do |s|
-      s.frame = CGRect.new([20, 150], [self.view.frame.size.width - 40, 40])
-      s.minimumValue = 0
-      s.maximumValue = 10
-      s.addTarget(self, action: "slidetastic", forControlEvents: UIControlEventValueChanged)
-    end
-  end
-
   def reposition_bar(divider_number)
     new_y_origin       = bar_position(divider_number)
     new_frame          = bar.frame
@@ -79,15 +70,18 @@ class SlideController < UIViewController
 
   def submit_feedback(value)
     data = {
-      'response[event_id]' => 1,
-      'response[user_id]'  => 3,
-      'response[value]'    => array[value.to_i][1],
-      'user[api_token]'    => "1cfc0f51520db5a3f5dfebb8bd437618"
+      'response[event_id]' => event[:id],
+      'response[user_id]'  => user_id,
+      'response[value]'    => value,
+      'user[api_token]'    => api_token
     }
+
     AFMotion::Client.shared.post("events/#{event[:id]}/responses", data) do |result|
-      parsed_string = result.object
       if result.success?
-        p parsed_string
+        parsed_string = result.object
+        label.text = "#{parsed_string}"
+      elsif result.failure?
+        label.text = "#{result.error.localizedDescription}"
       end
     end
   end
@@ -131,13 +125,6 @@ class SlideController < UIViewController
 
   def divider_height
     @divider_height ||= (self.view.frame.size.height - height) / (MAX + 1)
-  end
-
-  def height
-    nav_bar_height = self.navigationController.navigationBar.frame.size.height
-    status_height  = UIApplication.sharedApplication.statusBarFrame.size.height
-
-    @height ||= nav_bar_height + status_height
   end
 
   def bar_position(divider_number)
