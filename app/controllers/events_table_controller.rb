@@ -4,23 +4,55 @@ class EventsTableController < DialTestController
 
     self.view.addSubview(table)
 
+    control_view.addSubview(control)
+    self.navigationItem.titleView = control_view
+
     @data = []
-    fetch_events
+    fetch_events("all")
 
     table.dataSource = self
     table.delegate = self
   end
 
-  def fetch_events
+  def fetch_events(subset)
+    if subset == "all"
+      endpoint = "events"
+    elsif subset == "mine"
+      endpoint = "users/#{current_user_id}/user_events"
+    end
+
     data = {
       'user[api_token]'    => current_user_api_token
     }
-    AFMotion::Client.shared.get("events", data) do |result|
+
+    AFMotion::Client.shared.get(endpoint, data) do |result|
       if result.success?
         @data = result.object
         table.reloadData
       end
     end
+  end
+
+  def control
+    @control ||= UISegmentedControl.alloc.initWithItems(control_items).tap do |c|
+      c.selectedSegmentIndex = 0
+      c.setWidth(85.0, forSegmentAtIndex:0)
+      c.setWidth(85.0, forSegmentAtIndex:1)
+      c.addTarget(self, action:'control_change', forControlEvents:UIControlEventValueChanged)
+    end
+  end
+
+  def control_view
+    @control_view ||= UIView.alloc.initWithFrame(CGRectZero).tap do |cv|
+      cv.frame = CGRect.new(
+        [((self.view.frame.size.width - control.size.width) / 2), 0],
+        [control.size.width, control.size.height]
+      )
+    end
+  end
+
+  def control_items
+    @control_items ||= ["All Events", "My Events"]
   end
 
   def table
@@ -73,5 +105,18 @@ class EventsTableController < DialTestController
 
   def tableView(tableView, viewForFooterInSection: section)
     UIView.new
+  end
+
+  def control_change
+    case selected_control_label
+    when "All Events"
+      fetch_events("all")
+    when "My Events"
+      fetch_events("mine")
+    end
+  end
+
+  def selected_control_label
+    @selected_control_label ||= control.titleForSegmentAtIndex(control.selectedSegmentIndex)
   end
 end
