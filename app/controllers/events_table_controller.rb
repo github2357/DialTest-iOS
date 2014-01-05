@@ -13,7 +13,7 @@ class EventsTableController < DialTestController
 
   def fetch_events
     data = {
-      'user[api_token]'    => api_token
+      'user[api_token]'    => current_user_api_token
     }
     AFMotion::Client.shared.get("events", data) do |result|
       if result.success?
@@ -34,7 +34,7 @@ class EventsTableController < DialTestController
     tableView.deselectRowAtIndexPath(indexPath, animated: true)
     if @data.first.is_a?(Hash)
       event                = @data[indexPath.row]
-      controller           = SlideController.alloc.initWithNibName(nil, bundle:nil)
+      controller           = EventController.alloc.initWithNibName(nil, bundle:nil)
       controller.event     = event
       self.navigationController.pushViewController(controller, animated:true)
     end
@@ -60,7 +60,7 @@ class EventsTableController < DialTestController
       cell.detailTextLabel.text = nil
     elsif @data.first.is_a?(Hash)
       cell.textLabel.text       = event[:name]
-      cell.detailTextLabel.text = event[:ends_at]
+      cell.detailTextLabel.text = "#{event[:ends_at]} - #{event[:participant_count]}"
       cell.detailTextLabel.font = UIFont.systemFontOfSize(13)
     end
 

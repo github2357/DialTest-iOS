@@ -1,15 +1,27 @@
 class DialTestController < UIViewController
-  LOCAL_API_TOKEN = "1cfc0f51520db5a3f5dfebb8bd437618"
-  PROD_API_TOKEN  = "6dc2db61053257032e0e1d8ccf22dc7a"
-  API_TOKEN = "1cfc0f51520db5a3f5dfebb8bd437618"
-  USER_ID = 3
 
-  def api_token
-    @api_token ||= PROD_API_TOKEN
+  def current_user
+    @current_user ||= NSUserDefaults.standardUserDefaults["current_user"] rescue nil
   end
 
-  def user_id
-    @user_id ||= USER_ID
+  def current_user_api_token
+    @current_user_api_token ||= current_user["api_token"] rescue nil
+  end
+
+  def current_user_id
+    @current_user_id ||= current_user["id"] rescue nil
+  end
+
+  def delegate
+    @delegate ||= UIApplication.sharedApplication.delegate
+  end
+
+  def window
+    @window ||= delegate.window
+  end
+
+  def development?
+    RUBYMOTION_ENV == "development"
   end
 
   def height

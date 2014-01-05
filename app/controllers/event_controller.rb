@@ -1,4 +1,4 @@
-class SlideController < DialTestController
+class EventController < DialTestController
   attr_accessor :event
 
   MIN = 0
@@ -54,7 +54,7 @@ class SlideController < DialTestController
         end
 
         reposition_bar(divider_number + 1)
-        submit_feedback("#{divider_number}")
+        submit_feedback("#{divider_number}", Time.now.utc)
       end
 
       @last_timestamp = motion.timestamp
@@ -68,18 +68,19 @@ class SlideController < DialTestController
     bar.frame          = new_frame
   end
 
-  def submit_feedback(value)
+  def submit_feedback(value, timestamp)
     data = {
       'response[event_id]' => event[:id],
-      'response[user_id]'  => user_id,
+      'response[user_id]'  => current_user_id,
       'response[value]'    => value,
-      'user[api_token]'    => api_token
+      'response[time]'     => timestamp,
+      'user[api_token]'    => current_user_api_token
     }
 
     AFMotion::Client.shared.post("events/#{event[:id]}/responses", data) do |result|
       if result.success?
         parsed_string = result.object
-        label.text = "#{parsed_string}"
+        label.text = "#{parsed_string[:value]}"
       elsif result.failure?
         label.text = "#{result.error.localizedDescription}"
       end

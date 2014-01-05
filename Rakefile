@@ -2,6 +2,8 @@
 $:.unshift("/Library/RubyMotion/lib")
 require 'motion/project/template/ios'
 
+require 'motion-config-vars'
+
 begin
   require 'bundler'
   Bundler.require
