@@ -25,6 +25,7 @@ class DialTestController < UIViewController
   end
 
   def height
+    return 0 if self.navigationController.nil?
     nav_bar_height = self.navigationController.navigationBar.frame.size.height
     status_height  = UIApplication.sharedApplication.statusBarFrame.size.height
 
