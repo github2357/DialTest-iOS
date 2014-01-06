@@ -18,7 +18,8 @@ class EventsTableController < DialTestController
   end
 
   def new_event
-    controller = NewEventController.alloc.init
+    controller        = NewEventController.alloc.init
+    controller.parent = self
     self.presentViewController(
       UINavigationController.alloc.initWithRootViewController(controller),
       animated:true,
@@ -71,6 +72,7 @@ class EventsTableController < DialTestController
     @table ||= UITableView.alloc.initWithFrame(CGRectZero).tap do |t|
       t.frame            = self.view.bounds
       t.autoresizingMask = UIViewAutoresizingFlexibleHeight
+      t.rowHeight        = 65
     end
   end
 

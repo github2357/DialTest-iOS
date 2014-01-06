@@ -66,15 +66,15 @@ class NewEventController < Formotion::FormController
     data = {
       'event[name]'      => form.render[:name],
       'event[starts_at]' => form.render[:starts_at],
-      'event[ends_at]'   => form.render[:ends_at]
+      'event[ends_at]'   => form.render[:ends_at],
+      'user[api_token]'  => NSUserDefaults.standardUserDefaults["current_user"]["api_token"]
     }
 
     AFMotion::Client.shared.post("events", data) do |result|
       if result.success?
-        # @data = result.object
-        # table.reloadData
+        parent.fetch_events("all")
+        self.dismissViewControllerAnimated(true, completion:lambda {})
       else
-        p result.error.localizedRecoverySuggestion
       end
     end
   end
