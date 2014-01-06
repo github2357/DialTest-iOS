@@ -7,11 +7,23 @@ class EventsTableController < DialTestController
     control_view.addSubview(control)
     self.navigationItem.titleView = control_view
 
+    new_button = UIBarButtonItem.alloc.initWithTitle("New", style: UIBarButtonItemStyleBordered, target:self, action:'new_event')
+    self.navigationItem.rightBarButtonItem = new_button
+
     @data = []
     fetch_events("all")
 
     table.dataSource = self
     table.delegate = self
+  end
+
+  def new_event
+    controller = NewEventController.alloc.init
+    self.presentViewController(
+      UINavigationController.alloc.initWithRootViewController(controller),
+      animated:true,
+      completion: lambda {}
+    )
   end
 
   def fetch_events(subset)
@@ -79,22 +91,20 @@ class EventsTableController < DialTestController
   def tableView(tableView, cellForRowAtIndexPath: indexPath)
     @reuseIdentifier ||= "EventTableCell"
 
-    cell = tableView.dequeueReusableCellWithIdentifier(@reuseIdentifier) || begin
-      UITableViewCell.alloc.initWithStyle(UITableViewCellStyleSubtitle, reuseIdentifier:@reuseIdentifier)
-    end
-
     event = @data[indexPath.row]
 
-    cell.selectionStyle = UITableViewCellSelectionStyleGray
-
     if @data.first.is_a?(String)
+      cell                      = UITableViewCell.alloc.initWithStyle(UITableViewCellStyleDefault,reuseIdentifier:@reuseIdentifier)
       cell.textLabel.text       = event
       cell.detailTextLabel.text = nil
     elsif @data.first.is_a?(Hash)
-      cell.textLabel.text       = event[:name]
-      cell.detailTextLabel.text = "#{event[:ends_at]} - #{event[:participant_count]}"
-      cell.detailTextLabel.font = UIFont.systemFontOfSize(13)
+      cell        = EventCell.alloc.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:@reuseIdentifier)
+      cell.event  = event
+      cell.parent = self
+      cell.build
     end
+
+    cell.selectionStyle = UITableViewCellSelectionStyleGray
 
     cell
   end

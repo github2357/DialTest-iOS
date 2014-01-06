@@ -5,5 +5,6 @@ gem 'rake'
 
 gem 'afmotion'
 gem 'cocoapods'
+gem 'formotion'
 gem 'motion-cocoapods'
 gem 'motion-config-vars'
