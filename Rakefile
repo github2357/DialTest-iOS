@@ -16,7 +16,7 @@ Motion::Project::App.setup do |app|
 
   app.interface_orientations = [:portrait]
 
-  app.frameworks += %w(CoreMotion)
+  app.frameworks += %w(CoreMotion QuartzCore)
 
   app.pods do
     pod 'AFNetworking'

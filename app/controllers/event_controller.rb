@@ -7,11 +7,11 @@ class EventController < DialTestController
   def viewDidLoad
     super
 
-    self.view.backgroundColor = UIColor.whiteColor
-
     self.title = event[:name]
 
     build_dividers
+
+    add_gradients
 
     self.view.addSubview(bar)
 
@@ -107,7 +107,6 @@ class EventController < DialTestController
     MIN.upto(MAX) do |n|
       frame = CGRect.new([0, (n * divider_height) + height], [self.view.frame.size.width, divider_height])
       divider_view = UIView.alloc.initWithFrame(frame)
-      divider_view.backgroundColor  = UIColor.colorWithRed(235.0/255, green:235.0/255, blue:235.0/255, alpha:1)
       divider_view.layer.borderWidth = 0.5
       divider_view.layer.borderColor = UIColor.lightGrayColor.CGColor
 
@@ -138,6 +137,29 @@ class EventController < DialTestController
       [0, 5], [1, 4], [2, 3], [3, 2], [4, 1], [5, 0],
       [6, -1], [7, -2], [8, -3], [9, -4], [10, -5]
     ]
+  end
+
+  def add_gradients
+    gradient_frame_height  = (self.view.frame.size.height - height)
+    half_of_middle_divider = (divider_height / 2)
+
+    green_gradient        = CAGradientLayer.layer
+    green_gradient.frame  = CGRect.new([0, height], [self.view.frame.size.width, (gradient_frame_height / 2) - half_of_middle_divider])
+    green_gradient.colors = [UIColor.greenColor.CGColor, UIColor.greenColor.CGColor]
+
+    yellow_y_origin        = green_gradient.frame.origin.y + green_gradient.frame.size.height
+    yellow_gradient        = CAGradientLayer.layer
+    yellow_gradient.frame  = CGRect.new([0, yellow_y_origin], [self.view.frame.size.width, divider_height])
+    yellow_gradient.colors = [UIColor.yellowColor.CGColor, UIColor.yellowColor.CGColor]
+
+    red_y_origin        = yellow_gradient.frame.origin.y + divider_height
+    red_gradient        = CAGradientLayer.layer
+    red_gradient.frame  = CGRect.new([0, red_y_origin], [self.view.frame.size.width, (gradient_frame_height / 2) - half_of_middle_divider])
+    red_gradient.colors = [UIColor.redColor.CGColor, UIColor.redColor.CGColor]
+
+    self.view.layer.insertSublayer(green_gradient, atIndex: 0)
+    self.view.layer.insertSublayer(yellow_gradient, atIndex: 0)
+    self.view.layer.insertSublayer(red_gradient, atIndex: 0)
   end
 
 end
