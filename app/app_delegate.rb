@@ -13,6 +13,14 @@ class AppDelegate
       window.rootViewController = login_nav_controller
     end
 
+    UINavigationBar.appearance.setTitleTextAttributes(
+      { UITextAttributeTextColor => UIColor.whiteColor }
+    )
+    UINavigationBar.appearance.tintColor    = UIColor.whiteColor
+    UINavigationBar.appearance.barTintColor = UIColor.colorWithRed(50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 1.0)
+
+    window.rootViewController.navigationBar.translucent  = true
+
     true
   end
 

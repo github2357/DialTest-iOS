@@ -40,6 +40,7 @@ GEM
       motion-yaml (>= 1.0)
       rake-hooks (~> 1.2.3)
     motion-require (0.0.7)
+    motion-testflight (1.5)
     motion-yaml (1.2)
     multi_json (1.8.2)
     nap (0.6.0)
@@ -61,4 +62,5 @@ DEPENDENCIES
   formotion
   motion-cocoapods
   motion-config-vars
+  motion-testflight
   rake

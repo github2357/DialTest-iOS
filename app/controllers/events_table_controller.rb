@@ -15,6 +15,8 @@ class EventsTableController < DialTestController
 
     table.dataSource = self
     table.delegate = self
+
+    table.addSubview(refresh)
   end
 
   def new_event
@@ -72,7 +74,7 @@ class EventsTableController < DialTestController
     @table ||= UITableView.alloc.initWithFrame(CGRectZero).tap do |t|
       t.frame            = self.view.bounds
       t.autoresizingMask = UIViewAutoresizingFlexibleHeight
-      t.rowHeight        = 65
+      t.rowHeight        = 50
     end
   end
 
@@ -129,6 +131,17 @@ class EventsTableController < DialTestController
   end
 
   def selected_control_label
-    @selected_control_label ||= control.titleForSegmentAtIndex(control.selectedSegmentIndex)
+    control.titleForSegmentAtIndex(control.selectedSegmentIndex)
+  end
+
+  def refresh
+    @refresh ||= UIRefreshControl.alloc.init.tap do |r|
+      r.addTarget(self, action:'refresh_events', forControlEvents:UIControlEventValueChanged)
+    end
+  end
+
+  def refresh_events
+    control_change
+    refresh.endRefreshing
   end
 end
