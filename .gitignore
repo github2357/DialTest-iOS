@@ -17,3 +17,4 @@ nbproject
 
 # Ignore motion-config-vars config file
 resources/app.yml
+app/testflight_launcher.rb
