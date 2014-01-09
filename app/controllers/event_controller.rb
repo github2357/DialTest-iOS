@@ -22,20 +22,7 @@ class EventController < DialTestController
 
     @tilt_manager = CMMotionManager.alloc.init
 
-    if @tilt_manager.isDeviceMotionAvailable
-      queue = NSOperationQueue.alloc.init
-
-      device_motion_handler = lambda do |motion, error|
-        reposition_bar_and_submit(motion, error)
-      end
-
-      @tilt_manager.deviceMotionUpdateInterval = 1.0/60.0
-
-      @tilt_manager.startDeviceMotionUpdatesToQueue(queue, withHandler: device_motion_handler)
-    else
-      label.text = "Device Motion is unavailable in iOS simulator. Run `rake device` instead."
-    end
-
+    handle_pause
   end
 
   def reposition_bar_and_submit(motion, error)
@@ -167,6 +154,82 @@ class EventController < DialTestController
     self.view.layer.insertSublayer(green_gradient, atIndex: 0)
     self.view.layer.insertSublayer(yellow_gradient, atIndex: 0)
     self.view.layer.insertSublayer(red_gradient, atIndex: 0)
+  end
+
+  def shaking?
+    @shaking
+  end
+
+  def motionEnded(motion, withEvent:event)
+    @shaking = motion == UIEventSubtypeMotionShake
+    handle_pause
+  end
+
+  def handle_pause
+    if paused_alert_showing?
+      paused_alert.removeFromSuperview
+      start_updates
+    else
+      stop_updates
+      self.view.addSubview(paused_alert)
+      paused_alert.addSubview(paused_label)
+    end
+  end
+
+  def paused_alert
+    @paused_alert ||= UIView.alloc.initWithFrame(CGRectZero).tap do |pa|
+      pa.frame              = CGRect.new(
+        [20, (self.view.bounds.size.height / 2) - 40],
+        [self.view.frame.size.width - 40, 80]
+      )
+      pa.backgroundColor    = UIColor.colorWithRed(50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 0.95)
+      pa.layer.cornerRadius = 5.0
+      pa.sizeToFit
+    end
+  end
+
+  def paused_label
+    @paused_label ||= UILabel.alloc.initWithFrame(CGRectZero).tap do |pl|
+      pl.frame = CGRect.new(
+        [5, 5], [paused_alert.frame.size.width - 10, paused_alert.frame.size.height - 10]
+      )
+      pl.font          = UIFont.systemFontOfSize(14)
+      pl.numberOfLines = 0
+      pl.lineBreakMode = UILineBreakModeWordWrap
+      pl.color         = UIColor.whiteColor
+      pl.text          = "#{event[:name]} is paused. Shake again to dismiss."
+      pl.sizeToFit
+      pl.textAlignment = UITextAlignmentCenter
+      pl.center = [paused_alert.frame.size.width / 2, paused_alert.frame.size.height / 2]
+    end
+  end
+
+  def start_updates
+    if @tilt_manager.isDeviceMotionAvailable
+      queue = NSOperationQueue.alloc.init
+
+      device_motion_handler = lambda do |motion, error|
+        reposition_bar_and_submit(motion, error)
+      end
+
+      @tilt_manager.deviceMotionUpdateInterval = 1.0/60.0
+
+      @tilt_manager.startDeviceMotionUpdatesToQueue(queue, withHandler: device_motion_handler)
+    else
+      label.text = "Device Motion is unavailable in iOS simulator. Run `rake device` instead."
+    end
+  end
+
+  def stop_updates
+    if @tilt_manager.isDeviceMotionAvailable
+      @tilt_manager.stopDeviceMotionUpdates
+    else
+      label.text = "Device Motion is off but unavailable. Run `rake device` instead."
+    end
+  end
+
+  def paused_alert_showing?
+    self.view.subviews.include?(paused_alert)
   end
 
 end
