@@ -18,6 +18,7 @@ class EventController < DialTestController
     self.view.addSubview(label)
 
     @last_timestamp = 0
+    @old_value      = 0
 
     @tilt_manager = CMMotionManager.alloc.init
 
@@ -53,8 +54,12 @@ class EventController < DialTestController
           divider_number = pitch_value
         end
 
-        reposition_bar(divider_number + 1)
-        submit_feedback("#{divider_number}", Time.now.utc)
+        if divider_number != @old_value
+          reposition_bar(divider_number + 1)
+          submit_feedback("#{array[divider_number][1]}", Time.now.utc)
+        end
+
+        @old_value = divider_number
       end
 
       @last_timestamp = motion.timestamp
@@ -80,7 +85,6 @@ class EventController < DialTestController
     AFMotion::Client.shared.post("events/#{event[:id]}/responses", data) do |result|
       if result.success?
         parsed_string = result.object
-        label.text = "#{parsed_string[:value]}"
       elsif result.failure?
         label.text = "#{result.error.localizedDescription}"
       end
