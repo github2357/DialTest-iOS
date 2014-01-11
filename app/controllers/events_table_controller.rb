@@ -144,4 +144,23 @@ class EventsTableController < DialTestController
     control_change
     refresh.endRefreshing
   end
+
+  def leave_event(sender)
+    position   = sender.convertPoint(CGPointZero, toView: table)
+    index_path = table.indexPathForRowAtPoint(position)
+    event      = @data[index_path.row]
+
+    data = {
+      'user[api_token]'    => current_user_api_token
+    }
+
+    AFMotion::Client.shared.delete("event_participants/#{event[:id]}", data) do |result|
+      if result.success?
+        sender.removeFromSuperview
+        fetch_events("all")
+        table.reloadData
+      else
+      end
+    end
+  end
 end

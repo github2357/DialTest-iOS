@@ -15,9 +15,7 @@ class EventCell < UITableViewCell
     self.contentView.addSubview(participant_count)
 
     if event[:participating]
-      put_leave_button_on_top
-    else
-      put_join_button_on_top
+      self.contentView.addSubview(leave_button)
     end
   end
 
@@ -119,51 +117,14 @@ class EventCell < UITableViewCell
       ]
       button.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleTopMargin
       button.addTarget(self,
-        action:"leave",
+        action:"leave:",
         forControlEvents:UIControlEventTouchUpInside
       )
     end
   end
 
-  def join
-    put_leave_button_on_top
-
-    data = {
-      'user[api_token]' => current_user_api_token,
-      'id'              => event[:id]
-    }
-
-    AFMotion::Client.shared.post("event_participants", data) do |result|
-      if result.success?
-      else
-        put_join_button_on_top
-      end
-    end
-  end
-
-  def leave
-    put_join_button_on_top
-
-    data = {
-      'user[api_token]'    => current_user_api_token
-    }
-
-    AFMotion::Client.shared.delete("event_participants/#{event[:id]}", data) do |result|
-      if result.success?
-      else
-        put_leave_button_on_top
-      end
-    end
-  end
-
-  def put_leave_button_on_top
-    self.contentView.insertSubview(join_button, atIndex: 0)
-    self.contentView.insertSubview(leave_button, atIndex: 1)
-  end
-
-  def put_join_button_on_top
-    self.contentView.insertSubview(join_button, atIndex: 1)
-    self.contentView.insertSubview(leave_button, atIndex: 0)
+  def leave(sender)
+    parent.leave_event(sender)
   end
 
 end

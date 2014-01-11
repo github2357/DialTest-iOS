@@ -22,7 +22,14 @@ class EventController < DialTestController
 
     @tilt_manager = CMMotionManager.alloc.init
 
-    handle_pause
+    if event[:affiliations].any? && !event[:participating]
+      self.view.addSubview(picker)
+      picker.data   = event
+      picker.parent = self
+      picker.build_table
+    else
+      handle_pause
+    end
   end
 
   def reposition_bar_and_submit(motion, error)
@@ -127,6 +134,14 @@ class EventController < DialTestController
       [0, 5], [1, 4], [2, 3], [3, 2], [4, 1], [5, 0],
       [6, -1], [7, -2], [8, -3], [9, -4], [10, -5]
     ]
+  end
+
+  def picker
+    picker_frame = CGRect.new(
+      [20, (self.view.bounds.size.height - 350) / 2],
+      [self.view.frame.size.width - 40, 350]
+    )
+    @picker ||= PickerView.alloc.initWithFrame(picker_frame)
   end
 
   def add_gradients
