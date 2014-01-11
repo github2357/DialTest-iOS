@@ -87,6 +87,8 @@ class LoginController < DialTestController
   end
 
   def login(sender)
+    SVProgressHUD.show
+
     data = {
       "user[email]"    => email_field.text,
       "user[password]" => password_field.text
@@ -96,8 +98,10 @@ class LoginController < DialTestController
       if result.success?
         NSUserDefaults.standardUserDefaults["current_user"] = result.object
         window.rootViewController = delegate.events_nav_controller
+        SVProgressHUD.dismiss
       else
-        result.error.localizedRecoverySuggestion
+        SVProgressHUD.dismiss
+        alert(result.object["errors"])
       end
     end
   end

@@ -80,7 +80,7 @@ class EventController < DialTestController
       if result.success?
         parsed_string = result.object
       elsif result.failure?
-        label.text = "#{result.error.localizedDescription}"
+        label.text = "#{result.object["errors"]}"
       end
     end
   end

@@ -50,7 +50,7 @@ class PickerView < UIView
   def table_header
     table_header_frame = CGRect.new(
       [self.frame.origin.x, self.frame.origin.y],
-      [self.frame.size.width, 60]
+      [self.frame.size.width, 70]
     )
     @table_header ||= UIView.alloc.initWithFrame(table_header_frame)
   end
@@ -58,11 +58,11 @@ class PickerView < UIView
   def selection_notice
     @selection_notice ||= UILabel.alloc.initWithFrame(CGRectZero).tap do |sn|
       sn.frame         = CGRect.new(
-        [15, 5],
+        [15, 10],
         [table_header.frame.size.width - 30, table_header.frame.size.height]
       )
       sn.font          = UIFont.systemFontOfSize(15)
-      sn.text          = "Before you join #{data[:name]}, please identify with one of the options below:"
+      sn.text          = "#{data[:affiliation_description]}"
       sn.color         = UIColor.whiteColor
       sn.lineBreakMode = UILineBreakModeWordWrap
       sn.numberOfLines = 0

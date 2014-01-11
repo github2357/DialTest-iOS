@@ -31,6 +31,16 @@ class NewEventController < Formotion::FormController
           input_accessory: :done
         }]
       }, {
+        title: "Labels (optional)",
+        footer: "Let those participating identify themselves by selecting a label you provide. Separate labels with commas.",
+        rows: [{
+          type: :string,
+          placeholder: "ex: Democrat, Republican, Independent",
+          key: :affiliations,
+          auto_capitalization: :words,
+          input_accessory: :done
+        }]
+      }, {
         rows: [{
           title: "Create This Event",
           type: :button
@@ -64,9 +74,10 @@ class NewEventController < Formotion::FormController
 
   def create
     data = {
-      'event[name]'      => form.render[:name],
-      'event[starts_at]' => form.render[:starts_at],
-      'event[ends_at]'   => form.render[:ends_at],
+      'event[name]'         => form.render[:name],
+      'event[starts_at]'    => starts_at,
+      'event[ends_at]'      => ends_at,
+      'event[affiliations]' => form.render[:affiliations],
       'user[api_token]'  => NSUserDefaults.standardUserDefaults["current_user"]["api_token"]
     }
 
@@ -75,7 +86,24 @@ class NewEventController < Formotion::FormController
         parent.fetch_events("all")
         self.dismissViewControllerAnimated(true, completion:lambda {})
       else
+        App.alert(result.object["errors"])
       end
+    end
+  end
+
+  def starts_at
+    if form.render[:starts_at].nil?
+      nil
+    else
+      Time.at(form.render[:starts_at])
+    end
+  end
+
+  def ends_at
+    if form.render[:ends_at].nil?
+      nil
+    else
+      Time.at(form.render[:ends_at])
     end
   end
 

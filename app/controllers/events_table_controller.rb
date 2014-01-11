@@ -7,7 +7,7 @@ class EventsTableController < DialTestController
     control_view.addSubview(control)
     self.navigationItem.titleView = control_view
 
-    new_button = UIBarButtonItem.alloc.initWithTitle("New", style: UIBarButtonItemStyleBordered, target:self, action:'new_event')
+    new_button = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAdd, target:self, action: 'new_event')
     self.navigationItem.rightBarButtonItem = new_button
 
     @data = []
@@ -30,6 +30,8 @@ class EventsTableController < DialTestController
   end
 
   def fetch_events(subset)
+    SVProgressHUD.show
+
     if subset == "all"
       endpoint = "events"
     elsif subset == "mine"
@@ -44,6 +46,9 @@ class EventsTableController < DialTestController
       if result.success?
         @data = result.object
         table.reloadData
+        SVProgressHUD.dismiss
+      else
+        SVProgressHUD.dismiss
       end
     end
   end
