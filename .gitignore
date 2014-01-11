@@ -1,3 +1,4 @@
+.dat*
 .repl_history
 build/
 tags
@@ -8,6 +9,9 @@ resources/*.storyboardc
 .DS_Store
 nbproject
 .redcar
+*.swp
+*.swo
+
 #*#
 *~
 *.sw[po]
@@ -19,3 +23,5 @@ vendor/Pods
 # Ignore motion-config-vars config file
 resources/app.yml
 app/testflight_launcher.rb
+
+doc/
