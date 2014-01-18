@@ -26,9 +26,9 @@ class DialTestController < UIViewController
     @height ||= nav_bar_height + status_height
   end
 
-  def alert(title)
+  def alert(title=nil, message)
     alert = UIAlertView.alloc.initWithTitle(title,
-      message:nil,
+      message:message,
       delegate:nil,
       cancelButtonTitle:"OK",
       otherButtonTitles:nil

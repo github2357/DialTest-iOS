@@ -1,4 +1,6 @@
 class AppDelegate
+  include CurrentUser
+
   def application(application, didFinishLaunchingWithOptions:launchOptions)
     AFMotion::Client.build_shared("#{RMENV['host']}/#{RMENV['api_version']}") do
       header "Accept", "application/json"
@@ -7,10 +9,10 @@ class AppDelegate
 
     window.makeKeyAndVisible
 
-    if NSUserDefaults.standardUserDefaults["current_user"]
-      window.rootViewController = events_nav_controller
-    else
+    if current_user.nil?
       window.rootViewController = login_nav_controller
+    else
+      window.rootViewController = events_nav_controller
     end
 
     UINavigationBar.appearance.setTitleTextAttributes(
@@ -32,6 +34,8 @@ class AppDelegate
     UINavigationController.alloc.initWithRootViewController(yield)
   end
 
+  attr_accessor :login_nav_controller
+
   def events_nav_controller
     @events_nav_controller ||= begin
       with_navigation do
@@ -46,6 +50,13 @@ class AppDelegate
         @login ||= LoginController.alloc.initWithNibName(nil, bundle: nil)
       end
     end
+  end
+
+  def application(application, openURL:url,
+                  sourceApplication:sourceApplication,
+                  annotation:annotation)
+    wasHandled = FBAppCall.handleOpenURL(url, sourceApplication:sourceApplication)
+    p "application openURL"
   end
 
 end

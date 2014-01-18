@@ -7,6 +7,8 @@ class EventController < DialTestController
   def viewDidLoad
     super
 
+    get_event
+
     self.title = event[:name]
 
     build_dividers
@@ -17,12 +19,19 @@ class EventController < DialTestController
 
     self.view.addSubview(label)
 
+    @event = []
     @last_timestamp = 0
     @old_value      = 0
 
     @tilt_manager = CMMotionManager.alloc.init
 
-    if event[:affiliations].any? && !event[:participating]
+    @draggable = false
+
+    determine_right_nav_button
+  end
+
+  def load_picker
+    if @event[:affiliations].any? && !@event[:participating]
       self.view.addSubview(picker)
       picker.data   = event
       picker.parent = self
@@ -85,6 +94,19 @@ class EventController < DialTestController
     end
   end
 
+  def get_event
+    data = { 'user[api_token]' => current_user_api_token }
+
+    AFMotion::Client.shared.get("events/#{event[:id]}", data) do |result|
+      if result.success?
+        @event = result.object
+        load_picker
+      elsif result.failure?
+        alert("#{result.object["errors"]}")
+      end
+    end
+  end
+
   def label
     @label ||= UILabel.alloc.initWithFrame(CGRectZero).tap do |l|
       l.frame = CGRect.new([20, 100], [self.view.frame.size.width - 40, 40])
@@ -95,10 +117,8 @@ class EventController < DialTestController
   end
 
   def bar
-    @bar ||= UIView.alloc.initWithFrame(CGRectZero).tap do |b|
-      b.frame = CGRect.new([0, bar_position(6)], [self.view.frame.size.width, 5])
-      b.backgroundColor = UIColor.blackColor
-    end
+    bar_frame = CGRect.new([0, bar_position(6) - (divider_height / 2)], [self.view.frame.size.width, divider_height])
+    @bar ||= DialBar.alloc.initWithOptions(bar_frame, self)
   end
 
   def build_dividers
@@ -182,9 +202,11 @@ class EventController < DialTestController
 
   def handle_pause
     if paused_alert_showing?
+      self.navigationItem.rightBarButtonItem.enabled = true
       paused_alert.removeFromSuperview
       start_updates
     else
+      self.navigationItem.rightBarButtonItem.enabled = false
       stop_updates
       self.view.addSubview(paused_alert)
       paused_alert.addSubview(paused_label)
@@ -245,6 +267,46 @@ class EventController < DialTestController
 
   def paused_alert_showing?
     self.view.subviews.include?(paused_alert)
+  end
+
+  def frame
+    @frame ||= self.view.frame
+  end
+
+  def manual_button
+    @manual_button ||= UIBarButtonItem.alloc.initWithTitle("Drag", style: UIBarButtonItemStylePlain, target:self, action: 'switch_to_drag')
+  end
+
+  def tilt_button
+    @tilt_button ||= UIBarButtonItem.alloc.initWithTitle("Tilt", style: UIBarButtonItemStylePlain, target:self, action: 'switch_to_tilt')
+  end
+
+  def switch_to_tilt
+    @draggable = false
+    determine_right_nav_button
+    start_updates
+  end
+
+  def switch_to_drag
+    @draggable = true
+    determine_right_nav_button
+    stop_updates
+  end
+
+  def determine_right_nav_button
+    if @draggable
+      self.navigationItem.rightBarButtonItem = tilt_button
+    else
+      self.navigationItem.rightBarButtonItem = manual_button
+    end
+  end
+
+  def draggable?
+    @draggable
+  end
+
+  def viewWillDisappear(animated)
+    stop_updates
   end
 
 end

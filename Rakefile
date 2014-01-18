@@ -16,14 +16,21 @@ Motion::Project::App.setup do |app|
 
   app.interface_orientations = [:portrait]
 
-  app.frameworks += %w(CoreMotion QuartzCore)
+  app.frameworks += %w(CoreMotion QuartzCore AdSupport Accounts Social)
+  app.weak_frameworks += %w(AdSupport Accounts Social)
 
   app.info_plist['UIViewControllerBasedStatusBarAppearance'] = false
   app.info_plist["UIStatusBarStyle"] = "UIStatusBarStyleBlackOpaque"
 
+  app.info_plist['FacebookAppID']    = "615135201874047"
+  app.info_plist['CFBundleURLTypes'] = [
+    {"CFBundleURLSchemes" => ["fb615135201874047"]}
+  ]
+
   app.pods do
     pod 'AFNetworking'
     pod 'SVProgressHUD'
+    pod 'Facebook-iOS-SDK'
   end
 
   app.release do

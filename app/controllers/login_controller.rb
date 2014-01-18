@@ -1,26 +1,39 @@
 class LoginController < DialTestController
+  attr_accessor :email_field, :password_field
+
+  DESIRED_FB_ATTRIBUTES = %w(basic_info email user_location user_birthday)
+
   def viewDidLoad
+    NSNotificationCenter.defaultCenter.addObserver(self, selector:'handleKeyboardDidShow:', name:UIKeyboardDidShowNotification, object:nil)
+
     self.title = "Login"
     self.view.backgroundColor = UIColor.whiteColor
 
-    self.view.addSubview(field_views_background)
-    self.view.addSubview(field_views_divider)
-    self.view.addSubview(email_field)
-    self.view.addSubview(password_field)
-    self.view.addSubview(login_button)
+    self.view.addSubview(scroll)
+
+    scroll.addSubview(field_views_background)
+    field_views_background.addSubview(field_views_divider)
+    field_views_background.addSubview(email_field)
+    field_views_background.addSubview(password_field)
+    scroll.addSubview(login_button)
+    scroll.addSubview(signup_button)
+    scroll.addSubview(fb_button)
+
+    email_field.delegate    = self
+    password_field.delegate = self
   end
 
   def textFieldShouldReturn(textField)
     if textField == email_field
       self.password_field.becomeFirstResponder
     elsif textField = password_field
-      self.signin(login_button)
+      self.login
     end
     true
   end
 
   def field_views_background
-    @field_views_background ||= UIView.alloc.initWithFrame(CGRect.new([40, 155],[235, 80])).tap do |view|
+    @field_views_background ||= UIView.alloc.initWithFrame(CGRect.new([40, 75],[235, 80])).tap do |view|
       view.backgroundColor  = UIColor.colorWithRed(235.0/255, green:235.0/255, blue:235.0/255, alpha:1)
       view.layer.cornerRadius = 2.0
       view.layer.borderWidth = 0.6
@@ -30,7 +43,7 @@ class LoginController < DialTestController
   end
 
   def field_views_divider
-    @field_views_divider ||= UIView.alloc.initWithFrame(CGRect.new([40, 195],[235, 1])).tap do |divider|
+    @field_views_divider ||= UIView.alloc.initWithFrame(CGRect.new([0, 39.5],[235, 1])).tap do |divider|
       divider.backgroundColor  = UIColor.lightGrayColor
     end
   end
@@ -46,7 +59,7 @@ class LoginController < DialTestController
         field.keyboardType = UIKeyboardTypeEmailAddress
         field.autocapitalizationType = UITextAutocapitalizationTypeNone
         field.sizeToFit
-        field.frame = CGRect.new( [50, 162],[self.view.frame.size.width - 100, 28] )
+        field.frame = CGRect.new( [8, 6],[self.view.frame.size.width - 100, 28] )
       end
     end
   end
@@ -62,7 +75,7 @@ class LoginController < DialTestController
         field.autocapitalizationType = UITextAutocapitalizationTypeNone
         field.secureTextEntry = true
         field.sizeToFit
-        field.frame = CGRect.new( [50, 202],[self.view.frame.size.width - 100, 28] )
+        field.frame = CGRect.new( [8, 46],[self.view.frame.size.width - 100, 28] )
       end
     end
   end
@@ -81,12 +94,89 @@ class LoginController < DialTestController
       button.autoresizingMask =
         UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleTopMargin
       button.addTarget(self,
-        action:"login:",
+        action:"login",
         forControlEvents:UIControlEventTouchUpInside)
     end
   end
 
-  def login(sender)
+  def signup_button
+    @signup_button ||= UIButton.buttonWithType(UIButtonTypeCustom).tap do |button|
+      button.backgroundColor = UIColor.whiteColor
+      button.setTitle("Sign Up", forState:UIControlStateNormal)
+      button.setTitleColor(UIColor.blueColor, forState:UIControlStateNormal)
+      button.sizeToFit
+      button.frame = [
+        [40, login_button.frame.origin.y + login_button.frame.size.height + 40],
+        [235, 40]
+      ]
+      button.layer.cornerRadius = 2.0
+      button.layer.borderWidth  = 0.5
+      button.layer.borderColor  = UIColor.blueColor.CGColor
+      button.autoresizingMask   =
+        UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleTopMargin
+      button.addTarget(self,
+        action:"signup",
+        forControlEvents:UIControlEventTouchUpInside)
+    end
+  end
+
+  def fb_button
+    @fb_button ||= FBLoginView.alloc.initWithReadPermissions(DESIRED_FB_ATTRIBUTES).tap do |button|
+      button.frame    = [
+        [40, signup_button.frame.origin.y + signup_button.frame.size.height + 40],
+        [235, 46]
+      ]
+      button.delegate = self
+    end
+  end
+
+  def loginViewFetchedUserInfo(loginView, user: user)
+    data = { 'user' => user }
+
+    alert("FB Data", data)
+    # AFMotion::Client.shared.post("users", data ) do |result|
+    #   if result.success?
+    #     # NSUserDefaults.standardUserDefaults["current_user"] = result.object
+    #     # window.rootViewController = delegate.events_nav_controller
+    #     SVProgressHUD.dismiss
+    #   else
+    #     SVProgressHUD.dismiss
+    #     alert("Log in Failed", result.object["errors"])
+    #   end
+    # end
+  end
+
+  def loginViewShowingLoggedInUser(loginView)
+    p "loginViewShowingLoggedOutUser"
+  end
+
+  def loginViewShowingLoggedOutUser(loginView)
+    p "loginViewShowingLoggedOutUser"
+  end
+
+  def loginView(loginView, handleError:error)
+    if FBErrorUtility.shouldNotifyUserForError(error)
+      alertTitle = "Facebook error"
+      alertMessage = FBErrorUtility.userMessageForError(error)
+    elsif FBErrorUtility.errorCategoryForError(error) == FBErrorCategoryAuthenticationReopenSession
+      alertTitle = "Session Error"
+      alertMessage = "Your current session is no longer valid. Please log in again."
+    elsif FBErrorUtility.errorCategoryForError(error) == FBErrorCategoryUserCancelled
+      p "user cancelled login"
+    elsif error.fberrorShouldNotifyUser
+      alertTitle = "UH"
+      alertMessage = error.fberrorUserMessage
+    else
+      alertTitle  = "Something went wrong"
+      alertMessage = "Please try again later."
+    end
+
+    if (alertMessage)
+      alert(alertTitle, alertMessage)
+    end
+  end
+
+  def login
     SVProgressHUD.show
 
     data = {
@@ -101,10 +191,42 @@ class LoginController < DialTestController
         SVProgressHUD.dismiss
       else
         SVProgressHUD.dismiss
-        alert(result.object["errors"])
+        alert("Log in Failed", result.object["errors"])
       end
     end
   end
 
+  def scroll
+    @scroll ||= UIScrollView.alloc.initWithFrame(self.view.bounds).tap do |scroll|
+      scroll.bounces               = true
+      scroll.delegate              = self
+      scroll.alwaysBounceVertical  = true
+    end
+  end
 
+  def handleKeyboardDidShow(selector)
+    scroll.contentSize = CGSizeMake(self.view.bounds.size.width, self.view.bounds.size.height + 40)
+  end
+
+  def viewWillDisappear(animated)
+    super
+
+    NSNotificationCenter.defaultCenter.removeObserver(self)
+
+    self.view = nil
+
+    @email_field = nil
+    @password_field = nil
+    @field_views_background = nil
+    @field_views_divider = nil
+  end
+
+  def signup
+    controller        = SignUpController.alloc.init
+    self.presentViewController(
+      UINavigationController.alloc.initWithRootViewController(controller),
+      animated:true,
+      completion: lambda {}
+    )
+  end
 end

@@ -10,6 +10,9 @@ class EventsTableController < DialTestController
     new_button = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAdd, target:self, action: 'new_event')
     self.navigationItem.rightBarButtonItem = new_button
 
+    settings_button = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAction, target:self, action: 'settings')
+    self.navigationItem.leftBarButtonItem = settings_button
+
     @data = []
     fetch_events("all")
 
@@ -167,5 +170,14 @@ class EventsTableController < DialTestController
       else
       end
     end
+  end
+
+  def settings
+    controller = SettingsController.alloc.initWithNibName(nil, bundle:nil)
+    self.presentViewController(
+      UINavigationController.alloc.initWithRootViewController(controller),
+      animated:true,
+      completion: lambda {}
+    )
   end
 end
