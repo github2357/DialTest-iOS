@@ -133,21 +133,20 @@ class LoginController < DialTestController
   def loginViewFetchedUserInfo(loginView, user: user)
     data = { 'user' => user }
 
-    alert("FB Data", data)
-    # AFMotion::Client.shared.post("users", data ) do |result|
-    #   if result.success?
-    #     # NSUserDefaults.standardUserDefaults["current_user"] = result.object
-    #     # window.rootViewController = delegate.events_nav_controller
-    #     SVProgressHUD.dismiss
-    #   else
-    #     SVProgressHUD.dismiss
-    #     alert("Log in Failed", result.object["errors"])
-    #   end
-    # end
+    AFMotion::Client.shared.post("facebook_users", data ) do |result|
+      if result.success?
+        NSUserDefaults.standardUserDefaults["current_user"] = result.object
+        window.rootViewController = delegate.events_nav_controller
+        SVProgressHUD.dismiss
+      else
+        SVProgressHUD.dismiss
+        alert("Log in Failed", result.object["errors"]) if result.object
+      end
+    end
   end
 
   def loginViewShowingLoggedInUser(loginView)
-    p "loginViewShowingLoggedOutUser"
+    p "loginViewShowingLoggedInUser"
   end
 
   def loginViewShowingLoggedOutUser(loginView)

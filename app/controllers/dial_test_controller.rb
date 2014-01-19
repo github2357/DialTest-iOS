@@ -34,7 +34,6 @@ class DialTestController < UIViewController
       otherButtonTitles:nil
     )
     alert.show
+    p alert
   end
-
-
 end

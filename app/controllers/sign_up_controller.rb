@@ -7,17 +7,45 @@ class SignUpController < Formotion::FormController
   def form
     @form ||= Formotion::Form.new({
       sections: [{
+        title: "User Information",
         rows: [{
           title: "Email",
+          auto_capitalization: :none,
           type: :string,
           key: :email
+        }, {
+          title: "Password",
+          type: :string,
+          secure: true,
+          key: :password
         }]
       }, {
+        title: "Profile Information",
         rows: [{
-          type: :picker,
-          title: "Birthday",
-          key: :Birthday,
+          type: :string,
+          title: "Name",
+          auto_capitalization: :words,
+          key: :name,
           input_accessory: :done
+        }, {
+          title: "Birthday",
+          type: :date,
+          format: :medium,
+          key: :birthday,
+          input_accessory: :done
+        }, {
+          title: "Location",
+          type: :string,
+          auto_capitalization: :words,
+          key: :location
+        }, {
+          title: "Gender",
+          type: :picker,
+          items: [
+            ['Female', 'female'],['Male', 'male'],['Rather Not Say', 'rather not say']
+          ],
+          input_accessory: :done,
+          key: :gender
         }]
       }, {
         rows: [{
@@ -52,7 +80,33 @@ class SignUpController < Formotion::FormController
   end
 
   def sign_up
-    p "Sign up"
+    data = {
+      'user[email]'             => form.render[:email],
+      'user[password]'          => form.render[:password],
+      'user[profile][name]'     => form.render[:name],
+      'user[profile][birthday]' => birthday,
+      'user[profile][location]' => form.render[:location],
+      'user[profile][gender]'   => form.render[:gender]
+    }
+
+    AFMotion::Client.shared.post("users", data ) do |result|
+      if result.success?
+        NSUserDefaults.standardUserDefaults["current_user"] = result.object
+        window.rootViewController = delegate.events_nav_controller
+        SVProgressHUD.dismiss
+      else
+        SVProgressHUD.dismiss
+        App.alert("Sign Up Failed", :message => result.object["errors"])
+      end
+    end
+  end
+
+  def birthday
+    if form.render[:birthday].nil?
+      nil
+    else
+      Time.at(form.render[:birthday])
+    end
   end
 
 end

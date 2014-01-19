@@ -55,8 +55,7 @@ class AppDelegate
   def application(application, openURL:url,
                   sourceApplication:sourceApplication,
                   annotation:annotation)
-    wasHandled = FBAppCall.handleOpenURL(url, sourceApplication:sourceApplication)
-    p "application openURL"
+    was_handled = FBAppCall.handleOpenURL(url, sourceApplication:sourceApplication)
   end
 
 end
