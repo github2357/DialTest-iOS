@@ -92,7 +92,8 @@ class SignUpController < Formotion::FormController
     AFMotion::Client.shared.post("users", data ) do |result|
       if result.success?
         NSUserDefaults.standardUserDefaults["current_user"] = result.object
-        window.rootViewController = delegate.events_nav_controller
+        delegate = UIApplication.sharedApplication.delegate
+        delegate.window.rootViewController = delegate.events_nav_controller
         SVProgressHUD.dismiss
       else
         SVProgressHUD.dismiss

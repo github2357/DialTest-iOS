@@ -8,8 +8,11 @@ class SettingsController < DialTestController
     cancel_button = UIBarButtonItem.alloc.initWithTitle("Cancel", style: UIBarButtonItemStyleBordered, target:self, action:'cancel')
     self.navigationItem.leftBarButtonItem = cancel_button
 
-    self.view.addSubview(fb_logout_button)
-    self.view.addSubview(logout_button)
+    if current_user["facebook_profile"]
+      self.view.addSubview(fb_logout_button)
+    else
+      self.view.addSubview(logout_button)
+    end
   end
 
   def fb_logout_button
@@ -29,7 +32,7 @@ class SettingsController < DialTestController
       button.setTitleColor(UIColor.whiteColor, forState:UIControlStateNormal)
       button.sizeToFit
       button.frame = [
-        [40, fb_logout_button.frame.origin.y + fb_logout_button.frame.size.height + 10],
+        [40, 80],
         [235, 40]
       ]
       button.layer.cornerRadius = 2.0
@@ -43,7 +46,7 @@ class SettingsController < DialTestController
   end
 
   def loginViewShowingLoggedOutUser(loginView)
-    # logout
+    logout
   end
 
   def loginView(loginView, handleError:error)
