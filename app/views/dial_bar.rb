@@ -15,6 +15,7 @@ class DialBar < UIView
 
   def touchesMoved(touches, withEvent:event)
     return unless draggable?
+    add_arrows
     touch = touches.anyObject
     location = touch.locationInView(parent.view)
     if location.y < 64.0
@@ -30,6 +31,7 @@ class DialBar < UIView
   end
 
   def touchesEnded(touches, withEvent: event)
+    remove_arrows
     touch = touches.anyObject
     location = touch.locationInView(parent.view)
 
@@ -48,6 +50,34 @@ class DialBar < UIView
       )
       bb.backgroundColor = UIColor.blackColor
     end
+  end
+
+  def arrow_up
+    @arrow_up ||= UIImageView.alloc.initWithImage(UIImage.imageNamed("arrow_up.png")).tap do |arrow|
+      arrow.frame = CGRect.new(
+        [(self.frame.size.width / 2) - 7, black_bar.frame.origin.y - 4],
+        [14, 7]
+      )
+    end
+  end
+
+  def arrow_down
+    @arrow_down ||= UIImageView.alloc.initWithImage(UIImage.imageNamed("arrow_down.png")).tap do |arrow|
+      arrow.frame = CGRect.new(
+        [(self.frame.size.width / 2) - 7, black_bar.frame.origin.y + 7],
+        [14, 7]
+      )
+    end
+  end
+
+  def add_arrows
+    self.addSubview(arrow_up)
+    self.addSubview(arrow_down)
+  end
+
+  def remove_arrows
+    arrow_up.removeFromSuperview
+    arrow_down.removeFromSuperview
   end
 
 end
