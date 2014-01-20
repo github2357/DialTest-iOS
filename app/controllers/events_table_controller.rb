@@ -10,7 +10,7 @@ class EventsTableController < DialTestController
     new_button = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAdd, target:self, action: 'new_event')
     self.navigationItem.rightBarButtonItem = new_button
 
-    settings_button = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAction, target:self, action: 'settings')
+    settings_button = UIBarButtonItem.alloc.initWithImage(UIImage.imageNamed("profile_icon.png"), style: UIBarButtonItemStyleBordered, target:self, action:'settings')
     self.navigationItem.leftBarButtonItem = settings_button
 
     @data = []
