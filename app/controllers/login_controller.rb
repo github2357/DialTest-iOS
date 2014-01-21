@@ -51,15 +51,16 @@ class LoginController < DialTestController
   def email_field
     @email_field ||= begin
       UITextField.alloc.initWithFrame(CGRectZero).tap do |field|
-        field.borderStyle = UITextBorderStyleNone
-        field.clearButtonMode = UITextFieldViewModeWhileEditing
-        field.placeholder = "Email"
+        field.borderStyle                   = UITextBorderStyleNone
+        field.clearButtonMode               = UITextFieldViewModeWhileEditing
+        field.placeholder                   = "Email"
         field.enablesReturnKeyAutomatically = true
-        field.returnKeyType = UIReturnKeyNext
-        field.keyboardType = UIKeyboardTypeEmailAddress
-        field.autocapitalizationType = UITextAutocapitalizationTypeNone
+        field.returnKeyType                 = UIReturnKeyNext
+        field.keyboardType                  = UIKeyboardTypeEmailAddress
+        field.autocorrectionType            = UITextAutocorrectionTypeNo
+        field.autocapitalizationType        = UITextAutocapitalizationTypeNone
         field.sizeToFit
-        field.frame = CGRect.new( [8, 6],[self.view.frame.size.width - 100, 28] )
+        field.frame                         = CGRect.new([8, 6],[self.view.frame.size.width - 100, 28])
       end
     end
   end
@@ -67,15 +68,15 @@ class LoginController < DialTestController
   def password_field
     @password_field ||= begin
       UITextField.alloc.initWithFrame(CGRectZero).tap do |field|
-        field.borderStyle = UITextBorderStyleNone
-        field.clearButtonMode = UITextFieldViewModeWhileEditing
-        field.placeholder = "Password"
+        field.borderStyle                   = UITextBorderStyleNone
+        field.clearButtonMode               = UITextFieldViewModeWhileEditing
+        field.placeholder                   = "Password"
         field.enablesReturnKeyAutomatically = true
-        field.returnKeyType = UIReturnKeyGo
-        field.autocapitalizationType = UITextAutocapitalizationTypeNone
-        field.secureTextEntry = true
+        field.returnKeyType                 = UIReturnKeyGo
+        field.autocapitalizationType        = UITextAutocapitalizationTypeNone
+        field.secureTextEntry               = true
         field.sizeToFit
-        field.frame = CGRect.new( [8, 46],[self.view.frame.size.width - 100, 28] )
+        field.frame                         = CGRect.new([8, 46],[self.view.frame.size.width - 100, 28])
       end
     end
   end

@@ -11,6 +11,7 @@ class SignUpController < Formotion::FormController
         rows: [{
           title: "Email",
           auto_capitalization: :none,
+          auto_correction: :no,
           type: :string,
           key: :email
         }, {
