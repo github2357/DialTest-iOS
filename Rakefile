@@ -15,6 +15,7 @@ Motion::Project::App.setup do |app|
   # Use `rake config' to see complete project settings.
 
   app.interface_orientations = [:portrait]
+  app.device_family          = [:iphone]
 
   app.frameworks += %w(CoreMotion QuartzCore AdSupport Accounts Social)
   app.weak_frameworks += %w(AdSupport Accounts Social)
