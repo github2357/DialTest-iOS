@@ -55,8 +55,8 @@ class DialBar < UIView
   def arrow_up
     @arrow_up ||= UIImageView.alloc.initWithImage(UIImage.imageNamed("arrow_up.png")).tap do |arrow|
       arrow.frame = CGRect.new(
-        [(self.frame.size.width / 2) - 7, black_bar.frame.origin.y - 4],
-        [14, 7]
+        [(self.frame.size.width / 2) - 3.5, black_bar.frame.origin.y - 3],
+        [7, 3.5]
       )
     end
   end
@@ -64,8 +64,8 @@ class DialBar < UIView
   def arrow_down
     @arrow_down ||= UIImageView.alloc.initWithImage(UIImage.imageNamed("arrow_down.png")).tap do |arrow|
       arrow.frame = CGRect.new(
-        [(self.frame.size.width / 2) - 7, black_bar.frame.origin.y + 7],
-        [14, 7]
+        [(self.frame.size.width / 2) - 3.5, black_bar.frame.origin.y + black_bar.frame.size.height],
+        [7, 3.5]
       )
     end
   end
