@@ -234,7 +234,7 @@ class EventController < DialTestController
         [20, (self.view.bounds.size.height / 2) - 65],
         [self.view.frame.size.width - 40, 130]
       )
-      pa.backgroundColor    = UIColor.colorWithRed(50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 0.95)
+      pa.backgroundColor    = UIColor.colorWithRed(50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 0.97)
       pa.layer.cornerRadius = 5.0
       pa.sizeToFit
     end
@@ -262,7 +262,7 @@ class EventController < DialTestController
         [12, paused_label.frame.origin.y + paused_label.frame.size.height + 5],
         [paused_alert.frame.size.width - 24, paused_alert.frame.size.height - 10]
       )
-      pl.font          = UIFont.systemFontOfSize(14)
+      pl.font          = UIFont.systemFontOfSize(13)
       pl.numberOfLines = 0
       pl.lineBreakMode = UILineBreakModeWordWrap
       pl.color         = UIColor.whiteColor
