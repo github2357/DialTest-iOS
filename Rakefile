@@ -35,6 +35,15 @@ Motion::Project::App.setup do |app|
 
   app.release do
     app.name = 'DialTest'
+
+    app.codesign_certificate = 'iPhone Distribution: Travis Valentine (GHXQWFB2B2)'
+
+    app.entitlements['aps-environment'] = 'production'
+
+    app.deployment_target = '7.0'
+    app.version           = "1.0.0"
+
+    app.provisioning_profile = '/Users/travisvalentine/personal/DialTest-iOS-cert/DialTest_Distribution.mobileprovision'
   end
 
   app.development do

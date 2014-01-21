@@ -108,7 +108,7 @@ class EventController < DialTestController
         @event = result.object
         load_picker
       elsif result.failure?
-        alert("#{result.object["errors"]}")
+        alert("Whoops", message: "#{result.object["errors"]}")
       end
     end
   end

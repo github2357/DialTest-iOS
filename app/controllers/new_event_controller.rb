@@ -86,7 +86,7 @@ class NewEventController < Formotion::FormController
         parent.fetch_events("all")
         self.dismissViewControllerAnimated(true, completion:lambda {})
       else
-        App.alert(result.object["errors"])
+        App.alert("Event Errors", message: result.object["errors"])
       end
     end
   end

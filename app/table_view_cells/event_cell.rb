@@ -108,7 +108,7 @@ class EventCell < UITableViewCell
       button.setTitle("#{event[:leave]}", forState:UIControlStateNormal)
       button.setTitleColor(UIColor.blueColor, forState:UIControlStateNormal)
       button.layer.borderWidth  = 1
-      button.layer.borderColor  = UIColor.orangeColor.CGColor
+      button.layer.borderColor  = UIColor.blueColor.CGColor
       button.layer.cornerRadius = 2.0
       button.sizeToFit
       button.frame = [
