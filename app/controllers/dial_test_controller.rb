@@ -34,6 +34,11 @@ class DialTestController < UIViewController
       otherButtonTitles:nil
     )
     alert.show
-    p alert
+  end
+
+  def hit_bottom?(scrollView)
+    if scrollView.contentOffset.y > 0
+      scrollView.contentOffset.y > (scrollView.contentSize.height - scrollView.bounds.size.height - 5)
+    end
   end
 end

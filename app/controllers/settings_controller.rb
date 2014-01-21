@@ -1,24 +1,24 @@
 class SettingsController < DialTestController
   include CurrentUser
 
+  NON_DISPLAY_KEYS = %w(id api_token facebook_profile)
+
   def viewDidLoad
+    super
+
     self.title = "Settings"
     self.view.backgroundColor = UIColor.whiteColor
 
     cancel_button = UIBarButtonItem.alloc.initWithTitle("Cancel", style: UIBarButtonItemStyleBordered, target:self, action:'cancel')
     self.navigationItem.leftBarButtonItem = cancel_button
 
-    if current_user["facebook_profile"]
-      self.view.addSubview(fb_logout_button)
-    else
-      self.view.addSubview(logout_button)
-    end
+    self.view.addSubview(table)
   end
 
   def fb_logout_button
     @fb_logout_button ||= FBLoginView.alloc.initWithReadPermissions(LoginController::DESIRED_FB_ATTRIBUTES).tap do |button|
       button.frame = [
-        [40, 80],
+        [0, 0],
         [235, 46]
       ]
       button.delegate = self
@@ -32,7 +32,7 @@ class SettingsController < DialTestController
       button.setTitleColor(UIColor.whiteColor, forState:UIControlStateNormal)
       button.sizeToFit
       button.frame = [
-        [40, 80],
+        [0, 0],
         [235, 40]
       ]
       button.layer.cornerRadius = 2.0

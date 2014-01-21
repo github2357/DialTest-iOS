@@ -1,4 +1,6 @@
 class EventsTableController < DialTestController
+  attr_accessor :callbacks
+
   def viewDidLoad
     self.title = "Events"
 
@@ -14,7 +16,21 @@ class EventsTableController < DialTestController
     self.navigationItem.leftBarButtonItem = settings_button
 
     @data = []
+    @callbacks = {}
+
+    reset_page_variables
+
     fetch_events("all")
+
+    @callbacks[:all_events_scroll] = lambda {
+      page = @all_events_page
+      fetch_events("all", page, true) if @data.lastObject
+    }
+
+    @callbacks[:my_events_scroll] = lambda {
+      page = @my_events_page
+      fetch_events("mine", page, true) if @data.lastObject
+    }
 
     table.dataSource = self
     table.delegate = self
@@ -32,7 +48,7 @@ class EventsTableController < DialTestController
     )
   end
 
-  def fetch_events(subset)
+  def fetch_events(subset, page=nil, scrolling=false)
     SVProgressHUD.show
 
     if subset == "all"
@@ -42,12 +58,17 @@ class EventsTableController < DialTestController
     end
 
     data = {
-      'user[api_token]'    => current_user_api_token
+      'user[api_token]' => current_user_api_token,
+      'page'            => page
     }
 
     AFMotion::Client.shared.get(endpoint, data) do |result|
       if result.success?
-        @data = result.object
+        if scrolling
+          @data += result.object
+        else
+          @data = result.object
+        end
         table.reloadData
         SVProgressHUD.dismiss
       else
@@ -130,6 +151,8 @@ class EventsTableController < DialTestController
   end
 
   def control_change
+    reset_page_variables
+
     case selected_control_label
     when "All Events"
       fetch_events("all")
@@ -165,6 +188,7 @@ class EventsTableController < DialTestController
     AFMotion::Client.shared.delete("event_participants/#{event[:id]}", data) do |result|
       if result.success?
         sender.removeFromSuperview
+        reset_page_variables
         fetch_events("all")
         table.reloadData
       else
@@ -180,4 +204,28 @@ class EventsTableController < DialTestController
       completion: lambda {}
     )
   end
+
+  def reset_page_variables
+    @all_events_page = 1
+    @my_events_page  = 1
+  end
+
+  def scrollViewDidEndDragging(scrollView, willDecelerate:decelerate)
+    if scrolling("All Events") && hit_bottom?(scrollView) && !@callbacks[:all_events_scroll].nil?
+      @all_events_page += 1
+      @callbacks[:all_events_scroll].call()
+    elsif scrolling("My Events") && hit_bottom?(scrollView) && !@callbacks[:my_events_scroll].nil?
+      @my_events_page += 1
+      @callbacks[:my_events_scroll].call()
+    end
+  end
+
+  def scrolling(control_title)
+    if selected_control_label == control_title
+      true
+    else
+      false
+    end
+  end
+
 end
