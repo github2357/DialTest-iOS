@@ -6,7 +6,6 @@ class PickerView < UIView
   def initWithFrame(frame)
     super
 
-    # self.backgroundColor    = UIColor.colorWithRed(50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 0.98)
     self.layer.cornerRadius = 5.0
 
     self

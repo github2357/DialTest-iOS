@@ -59,7 +59,7 @@ class SignUpController < Formotion::FormController
   def viewDidAppear(animated)
     super
 
-    self.title = "Sign Up"
+    self.title = "Create an Account"
 
     cancel_button = UIBarButtonItem.alloc.initWithTitle("Cancel", style: UIBarButtonItemStyleBordered, target:self, action:'cancel')
     self.navigationItem.leftBarButtonItem = cancel_button

@@ -31,11 +31,17 @@ class EventController < DialTestController
   end
 
   def load_picker
+    turn_right_button("off")
+
     if @event[:affiliations].any? && !@event[:participating]
       self.view.addSubview(picker)
       picker.data   = event
       picker.parent = self
       picker.build_table
+    elsif @event[:ended]
+      self.view.addSubview(ended_notice)
+      ended_notice.alert = @event[:ended_notice]
+      ended_notice.notify
     else
       handle_pause
     end
@@ -164,6 +170,14 @@ class EventController < DialTestController
     @picker ||= PickerView.alloc.initWithFrame(picker_frame)
   end
 
+  def ended_notice
+    notice_frame = CGRect.new(
+      [20, (self.view.bounds.size.height / 2) - 40],
+      [self.view.frame.size.width - 40, 80]
+    )
+    @ended_notice ||= EndedNotice.alloc.initWithFrame(notice_frame)
+  end
+
   def add_gradients
     gradient_frame_height  = (self.view.frame.size.height - height)
     half_of_middle_divider = (divider_height / 2)
@@ -202,22 +216,23 @@ class EventController < DialTestController
 
   def handle_pause
     if paused_alert_showing?
-      self.navigationItem.rightBarButtonItem.enabled = true
+      turn_right_button("on")
       paused_alert.removeFromSuperview
       start_updates
     else
-      self.navigationItem.rightBarButtonItem.enabled = false
+      turn_right_button("off")
       stop_updates
       self.view.addSubview(paused_alert)
       paused_alert.addSubview(paused_label)
+      paused_alert.addSubview(reminder_label)
     end
   end
 
   def paused_alert
     @paused_alert ||= UIView.alloc.initWithFrame(CGRectZero).tap do |pa|
       pa.frame              = CGRect.new(
-        [20, (self.view.bounds.size.height / 2) - 40],
-        [self.view.frame.size.width - 40, 80]
+        [20, (self.view.bounds.size.height / 2) - 65],
+        [self.view.frame.size.width - 40, 130]
       )
       pa.backgroundColor    = UIColor.colorWithRed(50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 0.95)
       pa.layer.cornerRadius = 5.0
@@ -228,19 +243,34 @@ class EventController < DialTestController
   def paused_label
     @paused_label ||= UILabel.alloc.initWithFrame(CGRectZero).tap do |pl|
       pl.frame = CGRect.new(
-        [5, 5], [paused_alert.frame.size.width - 10, paused_alert.frame.size.height - 10]
+        [8, 8], [paused_alert.frame.size.width - 16, paused_alert.frame.size.height - 10]
+      )
+      pl.font          = UIFont.boldSystemFontOfSize(14)
+      pl.numberOfLines = 0
+      pl.lineBreakMode = UILineBreakModeWordWrap
+      pl.color         = UIColor.whiteColor
+      pl.text          = "Shake your phone to begin."
+      pl.sizeToFit
+      pl.textAlignment = UITextAlignmentCenter
+      pl.center        = [(self.frame.size.width - pl.frame.size.width), 18]
+    end
+  end
+
+  def reminder_label
+    @reminder_label ||= UILabel.alloc.initWithFrame(CGRectZero).tap do |pl|
+      pl.frame = CGRect.new(
+        [12, paused_label.frame.origin.y + paused_label.frame.size.height + 5],
+        [paused_alert.frame.size.width - 24, paused_alert.frame.size.height - 10]
       )
       pl.font          = UIFont.systemFontOfSize(14)
       pl.numberOfLines = 0
       pl.lineBreakMode = UILineBreakModeWordWrap
       pl.color         = UIColor.whiteColor
-      pl.text          = "#{event[:name]} is paused. Shake again to dismiss."
+      pl.text          = "Submit your feedback by tilting your phone or by dragging the dial. Tap the button in the top right at any time to change your preference."
       pl.sizeToFit
-      pl.textAlignment = UITextAlignmentCenter
-      pl.center = [paused_alert.frame.size.width / 2, paused_alert.frame.size.height / 2]
+      pl.textAlignment = UITextAlignmentLeft
     end
   end
-
   def start_updates
     if @tilt_manager.isDeviceMotionAvailable
       queue = NSOperationQueue.alloc.init
@@ -307,6 +337,15 @@ class EventController < DialTestController
 
   def viewWillDisappear(animated)
     stop_updates
+  end
+
+  def turn_right_button(switch)
+    case switch
+    when "on"
+      self.navigationItem.rightBarButtonItem.enabled = true
+    when "off"
+      self.navigationItem.rightBarButtonItem.enabled = false
+    end
   end
 
 end

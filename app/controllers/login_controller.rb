@@ -6,7 +6,7 @@ class LoginController < DialTestController
   def viewDidLoad
     NSNotificationCenter.defaultCenter.addObserver(self, selector:'handleKeyboardDidShow:', name:UIKeyboardDidShowNotification, object:nil)
 
-    self.title = "Login"
+    self.title = "DialTest"
     self.view.backgroundColor = UIColor.whiteColor
 
     self.view.addSubview(scroll)
@@ -102,16 +102,14 @@ class LoginController < DialTestController
   def signup_button
     @signup_button ||= UIButton.buttonWithType(UIButtonTypeCustom).tap do |button|
       button.backgroundColor = UIColor.whiteColor
-      button.setTitle("Sign Up", forState:UIControlStateNormal)
+      button.font            = UIFont.boldSystemFontOfSize(15)
+      button.setTitle("Create an Account", forState:UIControlStateNormal)
       button.setTitleColor(UIColor.blueColor, forState:UIControlStateNormal)
       button.sizeToFit
       button.frame = [
-        [40, login_button.frame.origin.y + login_button.frame.size.height + 40],
-        [235, 40]
+        [40, fb_button.frame.origin.y + fb_button.frame.size.height + 10],
+        [235, 46]
       ]
-      button.layer.cornerRadius = 2.0
-      button.layer.borderWidth  = 0.5
-      button.layer.borderColor  = UIColor.blueColor.CGColor
       button.autoresizingMask   =
         UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleTopMargin
       button.addTarget(self,
@@ -123,7 +121,7 @@ class LoginController < DialTestController
   def fb_button
     @fb_button ||= FBLoginView.alloc.initWithReadPermissions(DESIRED_FB_ATTRIBUTES).tap do |button|
       button.frame    = [
-        [40, signup_button.frame.origin.y + signup_button.frame.size.height + 40],
+        [40, self.view.frame.size.height - (46 * 2) - 120],
         [235, 46]
       ]
       button.delegate = self
