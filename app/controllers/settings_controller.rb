@@ -6,7 +6,7 @@ class SettingsController < DialTestController
   def viewDidLoad
     super
 
-    self.title = "Settings"
+    self.title = "Account"
     self.view.backgroundColor = UIColor.whiteColor
 
     cancel_button = UIBarButtonItem.alloc.initWithTitle("Cancel", style: UIBarButtonItemStyleBordered, target:self, action:'cancel')
@@ -18,9 +18,10 @@ class SettingsController < DialTestController
   def fb_logout_button
     @fb_logout_button ||= FBLoginView.alloc.initWithReadPermissions(LoginController::DESIRED_FB_ATTRIBUTES).tap do |button|
       button.frame = [
-        [0, 0],
+        [(235 - (self.view.frame.size.width / 2)) / 2, 0],
         [235, 46]
       ]
+      button.layer.borderColor = UIColor.colorWithRed(59.0/255.0, green: 87.0/255.0, blue: 157.0/255.0, alpha: 1.0)
       button.delegate = self
     end
   end
@@ -32,8 +33,8 @@ class SettingsController < DialTestController
       button.setTitleColor(UIColor.whiteColor, forState:UIControlStateNormal)
       button.sizeToFit
       button.frame = [
-        [0, 0],
-        [235, 40]
+        [(235 - (self.view.frame.size.width / 2)) / 2, 0],
+        [235, 46]
       ]
       button.layer.cornerRadius = 2.0
       button.autoresizingMask =
@@ -42,7 +43,68 @@ class SettingsController < DialTestController
         action:"logout",
         forControlEvents:UIControlEventTouchUpInside)
     end
+  end
 
+  def table
+    @table ||= UITableView.alloc.initWithFrame(self.view.bounds, style: UITableViewStyleGrouped).tap do |t|
+      t.autoresizingMask = UIViewAutoresizingFlexibleHeight
+      t.dataSource       = self
+      t.delegate         = self
+      t.rowHeight        = 46
+    end
+  end
+
+  def sections
+    data.keys
+  end
+
+  def rows_for_section(section_index)
+    data[self.sections[section_index]]
+  end
+
+  def row_for_index_path(index_path)
+    rows_for_section(index_path.section)[index_path.row]
+  end
+
+  def tableView(tableView, titleForHeaderInSection:section)
+    section == 0 ? sections[section] : nil
+  end
+
+  def numberOfSectionsInTableView(tableView)
+    self.sections.count
+  end
+
+  def tableView(tableView, numberOfRowsInSection: section)
+    rows_for_section(section).count
+  end
+
+  def tableView(tableView, cellForRowAtIndexPath: indexPath)
+    @reuseIdentifier ||= "SettingsCell"
+
+    key, value = row_for_index_path(indexPath).first
+
+    cell = SettingsCell.alloc.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:@reuseIdentifier)
+
+    if indexPath.section == 0
+      cell.key = key.capitalize
+      cell.value = value
+      cell.contentView.addSubview(cell.label)
+      cell.contentView.addSubview(cell.content)
+    elsif indexPath.section == 1
+      if current_user["facebook_profile"]
+        cell.contentView.backgroundColor = UIColor.colorWithRed(59.0/255.0, green: 87.0/255.0, blue: 157.0/255.0, alpha: 1.0)
+        cell.contentView.addSubview(fb_logout_button)
+      else
+        cell.contentView.backgroundColor = UIColor.blueColor
+        cell.contentView.addSubview(logout_button)
+      end
+    end
+
+    cell
+  end
+
+  def tableView(tableView, didSelectRowAtIndexPath: indexPath)
+    tableView.deselectRowAtIndexPath(indexPath, animated: true)
   end
 
   def loginViewShowingLoggedOutUser(loginView)
@@ -82,5 +144,15 @@ class SettingsController < DialTestController
   def reset_root
     remove_current_user
     window.rootViewController = delegate.login_nav_controller
+  end
+
+  def data
+    new_hash = current_user.clone
+    new_hash.reject!{ |k,v| NON_DISPLAY_KEYS.include?(k) }
+
+    settings_hash = Hash.new
+    settings_hash["Personal Information"] = new_hash.map{|k,v| {k=>v} }
+    settings_hash["Logout"] = [{"logout" => "logout"}]
+    settings_hash
   end
 end
