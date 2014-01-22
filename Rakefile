@@ -20,7 +20,7 @@ Motion::Project::App.setup do |app|
   end
 
   app.development do
-    app.identifier = 'com.dialtest.DialTest-Test'
+    app.identifier = 'com.dialtest.DialTest-iOS-Beta'
     app.name = 'DialTest-Test'
   end
 
