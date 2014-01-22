@@ -16,6 +16,7 @@ Motion::Project::App.setup do |app|
 
   app.interface_orientations = [:portrait]
   app.device_family          = [:iphone]
+  app.icons = ['icon_1024', 'icon_120', 'icon_80', 'icon_58', 'icon_50', 'icon_44']
 
   app.frameworks += %w(CoreMotion QuartzCore AdSupport Accounts Social)
   app.weak_frameworks += %w(AdSupport Accounts Social)
