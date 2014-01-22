@@ -36,7 +36,7 @@ class DialBar < UIView
     location = touch.locationInView(parent.view)
 
     value = ((location.y - parent.height) / parent.divider_height).round
-    parent.submit_feedback("#{parent.array[value][1]}", Time.now)
+    parent.submit_feedback("#{parent.array[value][1]}", Time.now, Time.now.zone)
   end
 
   def draggable?

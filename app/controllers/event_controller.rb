@@ -65,7 +65,7 @@ class EventController < DialTestController
 
         if divider_number != @old_value
           reposition_bar(divider_number + 1)
-          submit_feedback("#{array[divider_number][1]}", Time.now.utc)
+          submit_feedback("#{array[divider_number][1]}", Time.now.utc, Time.now.zone)
         end
 
         @old_value = divider_number
@@ -82,12 +82,13 @@ class EventController < DialTestController
     bar.frame          = new_frame
   end
 
-  def submit_feedback(value, timestamp)
+  def submit_feedback(value, timestamp, timezone)
     data = {
       'response[event_id]' => event[:id],
       'response[user_id]'  => current_user_id,
       'response[value]'    => value,
       'response[time]'     => timestamp,
+      'response[timezone]' => timezone,
       'user[api_token]'    => current_user_api_token
     }
 
