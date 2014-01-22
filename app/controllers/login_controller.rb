@@ -203,7 +203,7 @@ class LoginController < DialTestController
   end
 
   def handleKeyboardDidShow(selector)
-    scroll.contentSize = CGSizeMake(self.view.bounds.size.width, self.view.bounds.size.height + 40)
+    scroll.contentSize = CGSizeMake(self.view.bounds.size.width, self.view.bounds.size.height + 120)
   end
 
   def viewWillDisappear(animated)
