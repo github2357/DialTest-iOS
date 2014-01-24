@@ -34,7 +34,7 @@ Motion::Project::App.setup do |app|
     app.entitlements['get-task-allow'] = true
     app.entitlements['aps-environment'] = 'development'
 
-    app.provisioning_profile = '/Users/travisvalentine/personal/DialTest-iOS-cert/DialTest_1388544764.mobileprovision'
+    app.provisioning_profile = '/Users/travisvalentine/personal/DialTest-iOS-cert/DialTest_1390582194.mobileprovision'
 
     # Testflight credentials
     app.testflight do
