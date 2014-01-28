@@ -130,6 +130,8 @@ class LoginController < DialTestController
   end
 
   def loginViewFetchedUserInfo(loginView, user: user)
+    SVProgressHUD.show
+
     data = { 'user' => user }
 
     AFMotion::Client.shared.post("facebook_users", data ) do |result|
@@ -145,11 +147,9 @@ class LoginController < DialTestController
   end
 
   def loginViewShowingLoggedInUser(loginView)
-    p "loginViewShowingLoggedInUser"
   end
 
   def loginViewShowingLoggedOutUser(loginView)
-    p "loginViewShowingLoggedOutUser"
   end
 
   def loginView(loginView, handleError:error)
@@ -160,9 +160,10 @@ class LoginController < DialTestController
       alertTitle = "Session Error"
       alertMessage = "Your current session is no longer valid. Please log in again."
     elsif FBErrorUtility.errorCategoryForError(error) == FBErrorCategoryUserCancelled
-      p "user cancelled login"
+      alertTitle = "Whoops"
+      alertMessage = "Looks like you cancelled Login. Try again."
     elsif error.fberrorShouldNotifyUser
-      alertTitle = "UH"
+      alertTitle = "Whoops!"
       alertMessage = error.fberrorUserMessage
     else
       alertTitle  = "Something went wrong"

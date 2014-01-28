@@ -6,7 +6,7 @@ class SettingsController < DialTestController
   def viewDidLoad
     super
 
-    self.title = "Account"
+    self.title = "My Account"
     self.view.backgroundColor = UIColor.whiteColor
 
     cancel_button = UIBarButtonItem.alloc.initWithTitle("Cancel", style: UIBarButtonItemStyleBordered, target:self, action:'cancel')

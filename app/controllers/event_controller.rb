@@ -96,7 +96,7 @@ class EventController < DialTestController
       if result.success?
         parsed_string = result.object
       elsif result.failure?
-        label.text = "#{result.object["errors"]}"
+        alert("Whoops!", "#{result.object["errors"]}")
       end
     end
   end
@@ -284,15 +284,13 @@ class EventController < DialTestController
 
       @tilt_manager.startDeviceMotionUpdatesToQueue(queue, withHandler: device_motion_handler)
     else
-      label.text = "Device Motion is unavailable in iOS simulator. Run `rake device` instead."
+      alert("Device Error", "Tilt is unavailble. Please choose drag.")
     end
   end
 
   def stop_updates
     if @tilt_manager.isDeviceMotionAvailable
       @tilt_manager.stopDeviceMotionUpdates
-    else
-      label.text = "Device Motion is off but unavailable. Run `rake device` instead."
     end
   end
 
