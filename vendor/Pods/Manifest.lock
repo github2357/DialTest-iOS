@@ -17,17 +17,20 @@ PODS:
   - AFNetworking/Serialization (2.0.3)
   - AFNetworking/UIKit (2.0.3):
     - AFNetworking/NSURLConnection
+  - CocoaAsyncSocket (7.3.4)
   - Facebook-iOS-SDK (3.11.0)
   - SVProgressHUD (1.0)
 
 DEPENDENCIES:
   - AFNetworking
   - AFNetworking (~> 2.0.1)
+  - CocoaAsyncSocket
   - Facebook-iOS-SDK
   - SVProgressHUD
 
 SPEC CHECKSUMS:
   AFNetworking: e499052cbf3d743e9bb727bb37adb9dc2547ba15
+  CocoaAsyncSocket: 534d09416f992fd51efb23f534742ce70b3a7999
   Facebook-iOS-SDK: 2eb12f9ed04f3d3956f0a4fb0e4e60c824dcd101
   SVProgressHUD: 5e10939a296debf5fe5a5895eda9539b8b2114f1
 

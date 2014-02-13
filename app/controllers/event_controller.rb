@@ -30,6 +30,52 @@ class EventController < DialTestController
     determine_right_nav_button
   end
 
+  def viewWillAppear(animated)
+    reconnect
+  end
+
+  def reconnect
+    @socket = AsyncSocket.alloc.initWithDelegate(self)
+    @socket.connectToHost("0.0.0.0", onPort:"5001", error:nil)
+    @socket.delegate  = self
+  end
+
+  def onSocketWillConnect(socket)
+    p "WILL CONNECT!?"
+  end
+
+  def onSocket(socket, didConnectToHost: host, port: port)
+    p "PDFKJLDSKFJKLSDJ"
+    p "CONNECTED HOST: #{host}"
+    p "CONNECTED PORT: #{port}"
+  end
+
+  def onSocket(socket, didWriteDataWithTag: tag)
+    p "SENT"
+    p "UNREAD DATA: #{socket.unreadData}"
+  end
+
+  def onSocket(socket, willDisconnectWithError: error)
+    p "ERROR: #{error.localizedDescription}"
+  end
+
+  # def webSocketDidOpen(webSocket)
+  #   puts "CONNECTED!"
+  # end
+
+  # def webSocket(webSocket, didFailWithError: error)
+  #   puts "FAILED: #{error.localizedDescription}"
+  #   @socket = nil
+  # end
+
+  # def webSocket(webSocket, didReceiveMessage: message)
+  #   puts "RECEIVED: #{message}"
+  # end
+
+  # def webSocket(webSocket, didCloseWithCode: code, reason: reason, wasClean: wasClean)
+  #   puts "CLOSING: #{code} #{reason} #{wasClean}"
+  # end
+
   def load_picker
     turn_right_button("off")
 
@@ -65,7 +111,7 @@ class EventController < DialTestController
 
         if divider_number != @old_value
           reposition_bar(divider_number + 1)
-          submit_feedback("#{array[divider_number][1]}", Time.now.utc, Time.now.zone)
+          submit_feedback("#{array[divider_number][1]}", Time.now.to_i, Time.now.zone)
         end
 
         @old_value = divider_number
@@ -83,22 +129,20 @@ class EventController < DialTestController
   end
 
   def submit_feedback(value, timestamp, timezone)
-    data = {
-      'response[event_id]' => event[:id],
-      'response[user_id]'  => current_user_id,
-      'response[value]'    => value,
-      'response[time]'     => timestamp,
-      'response[timezone]' => timezone,
-      'user[api_token]'    => current_user_api_token
-    }
+    event_id = Pointer.new(:int)
+    event_id.assign(@event["id"].to_i)
 
-    AFMotion::Client.shared.post("events/#{event[:id]}/responses", data) do |result|
-      if result.success?
-        parsed_string = result.object
-      elsif result.failure?
-        alert("Whoops!", "#{result.object["errors"]}")
-      end
-    end
+    user_id = Pointer.new(:int)
+    user_id.assign(current_user_id.to_i)
+
+    sent_value = Pointer.new(:int)
+    sent_value.assign(value.to_i)
+
+    packed_data = NSMutableData.alloc.initWithBytes(event_id, length: 4)
+    packed_data.appendBytes(user_id, length: 4)
+    packed_data.appendBytes(sent_value, length: 4)
+
+    @socket.writeData(packed_data, withTimeout: -1, tag: 0)
   end
 
   def get_event
@@ -272,6 +316,7 @@ class EventController < DialTestController
       pl.textAlignment = UITextAlignmentLeft
     end
   end
+
   def start_updates
     if @tilt_manager.isDeviceMotionAvailable
       queue = NSOperationQueue.alloc.init
@@ -335,6 +380,8 @@ class EventController < DialTestController
   end
 
   def viewWillDisappear(animated)
+    @socket.close
+
     stop_updates
   end
 

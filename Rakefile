@@ -63,7 +63,8 @@ Motion::Project::App.setup do |app|
 
   app.pods do
     pod 'AFNetworking'
-    pod 'SVProgressHUD'
+    pod 'CocoaAsyncSocket'
     pod 'Facebook-iOS-SDK'
+    pod 'SVProgressHUD'
   end
 end
