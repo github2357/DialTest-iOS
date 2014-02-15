@@ -138,9 +138,12 @@ class EventController < DialTestController
     sent_value = Pointer.new(:int)
     sent_value.assign(value.to_i)
 
+    affiliation = @event["current_participant"]["affiliation"].dataUsingEncoding(NSUTF8StringEncoding)
+
     packed_data = NSMutableData.alloc.initWithBytes(event_id, length: 4)
     packed_data.appendBytes(user_id, length: 4)
     packed_data.appendBytes(sent_value, length: 4)
+    packed_data.appendData(affiliation)
 
     @socket.writeData(packed_data, withTimeout: -1, tag: 0)
   end
