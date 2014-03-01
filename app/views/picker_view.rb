@@ -126,6 +126,7 @@ class PickerView < UIView
       if result.success?
         self.removeFromSuperview
         parent.handle_pause
+        parent.get_event(@data[:id])
       else
         # put_join_button_on_top
       end

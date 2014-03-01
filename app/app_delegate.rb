@@ -2,7 +2,7 @@ class AppDelegate
   include CurrentUser
 
   def application(application, didFinishLaunchingWithOptions:launchOptions)
-    AFMotion::Client.build_shared("#{RMENV['host']}/#{RMENV['api_version']}") do
+    AFMotion::Client.build_shared("http://#{RMENV['host']}/#{RMENV['api_version']}") do
       header "Accept", "application/json"
       response_serializer :json
     end

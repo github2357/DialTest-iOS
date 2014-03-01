@@ -7,7 +7,7 @@ class EventController < DialTestController
   def viewDidLoad
     super
 
-    get_event
+    get_event(event[:id])
 
     self.title = event[:name]
 
@@ -36,7 +36,7 @@ class EventController < DialTestController
 
   def reconnect
     @socket = AsyncSocket.alloc.initWithDelegate(self)
-    @socket.connectToHost("0.0.0.0", onPort:"5001", error:nil)
+    @socket.connectToHost("#{RMENV['host']}", onPort:"5001", error:nil)
     @socket.delegate  = self
   end
 
@@ -58,23 +58,6 @@ class EventController < DialTestController
   def onSocket(socket, willDisconnectWithError: error)
     p "ERROR: #{error.localizedDescription}"
   end
-
-  # def webSocketDidOpen(webSocket)
-  #   puts "CONNECTED!"
-  # end
-
-  # def webSocket(webSocket, didFailWithError: error)
-  #   puts "FAILED: #{error.localizedDescription}"
-  #   @socket = nil
-  # end
-
-  # def webSocket(webSocket, didReceiveMessage: message)
-  #   puts "RECEIVED: #{message}"
-  # end
-
-  # def webSocket(webSocket, didCloseWithCode: code, reason: reason, wasClean: wasClean)
-  #   puts "CLOSING: #{code} #{reason} #{wasClean}"
-  # end
 
   def load_picker
     turn_right_button("off")
@@ -148,10 +131,10 @@ class EventController < DialTestController
     @socket.writeData(packed_data, withTimeout: -1, tag: 0)
   end
 
-  def get_event
+  def get_event(event_id)
     data = { 'user[api_token]' => current_user_api_token }
 
-    AFMotion::Client.shared.get("events/#{event[:id]}", data) do |result|
+    AFMotion::Client.shared.get("events/#{event_id}", data) do |result|
       if result.success?
         @event = result.object
         load_picker
