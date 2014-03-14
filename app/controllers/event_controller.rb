@@ -32,11 +32,13 @@ class EventController < DialTestController
 
   def viewWillAppear(animated)
     reconnect
+
+    self.tabBarController.tabBar.hidden = true
   end
 
   def reconnect
     @socket = AsyncSocket.alloc.initWithDelegate(self)
-    @socket.connectToHost("#{RMENV['host']}", onPort:"5001", error:nil)
+    @socket.connectToHost("#{RMENV['host']}", onPort:"#{RMENV['socket_port']}", error:nil)
     @socket.delegate  = self
   end
 
@@ -45,7 +47,6 @@ class EventController < DialTestController
   end
 
   def onSocket(socket, didConnectToHost: host, port: port)
-    p "PDFKJLDSKFJKLSDJ"
     p "CONNECTED HOST: #{host}"
     p "CONNECTED PORT: #{port}"
   end
@@ -369,6 +370,8 @@ class EventController < DialTestController
     @socket.close
 
     stop_updates
+
+    self.tabBarController.tabBar.hidden = false
   end
 
   def turn_right_button(switch)

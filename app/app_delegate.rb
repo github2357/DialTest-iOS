@@ -2,17 +2,27 @@ class AppDelegate
   include CurrentUser
 
   def application(application, didFinishLaunchingWithOptions:launchOptions)
-    AFMotion::Client.build_shared("http://#{RMENV['host']}/#{RMENV['api_version']}") do
+    if RMENV["API_ENV"] == "production"
+      host = "#{RMENV['host']}"
+    else
+      host = "#{RMENV['host']}:9292"
+    end
+
+    AFMotion::Client.build_shared("http://#{host}/#{RMENV['api_version']}") do
       header "Accept", "application/json"
       response_serializer :json
     end
+
+    tab_controller.viewControllers = [
+      events_nav_controller, settings_nav_controller
+    ]
 
     window.makeKeyAndVisible
 
     if current_user.nil?
       window.rootViewController = login_nav_controller
     else
-      window.rootViewController = events_nav_controller
+      window.rootViewController = tab_controller
     end
 
     UINavigationBar.appearance.setTitleTextAttributes(
@@ -21,7 +31,7 @@ class AppDelegate
     UINavigationBar.appearance.tintColor    = UIColor.whiteColor
     UINavigationBar.appearance.barTintColor = UIColor.colorWithRed(50.0/255.0, green: 50.0/255.0, blue: 50.0/255.0, alpha: 1.0)
 
-    window.rootViewController.navigationBar.translucent  = true
+    # window.rootViewController.navigationBar.translucent  = true
 
     true
   end
@@ -36,10 +46,22 @@ class AppDelegate
 
   attr_accessor :login_nav_controller
 
+  def tab_controller
+    @tab_controller ||= TabController.alloc.initWithNibName(nil, bundle: nil)
+  end
+
   def events_nav_controller
     @events_nav_controller ||= begin
       with_navigation do
         @events ||= EventsTableController.alloc.initWithNibName(nil, bundle: nil)
+      end
+    end
+  end
+
+  def settings_nav_controller
+    @settings_nav_controller ||= begin
+      with_navigation do
+        @settings ||= SettingsController.alloc.initWithNibName(nil, bundle: nil)
       end
     end
   end
