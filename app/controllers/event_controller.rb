@@ -33,7 +33,9 @@ class EventController < DialTestController
   def viewWillAppear(animated)
     reconnect
 
-    self.tabBarController.tabBar.hidden = true
+    if self.tabBarController
+      self.tabBarController.tabBar.hidden = true
+    end
   end
 
   def reconnect
@@ -43,21 +45,19 @@ class EventController < DialTestController
   end
 
   def onSocketWillConnect(socket)
-    p "WILL CONNECT!?"
+    p socket
   end
 
   def onSocket(socket, didConnectToHost: host, port: port)
-    p "CONNECTED HOST: #{host}"
-    p "CONNECTED PORT: #{port}"
+    p socket
   end
 
   def onSocket(socket, didWriteDataWithTag: tag)
-    p "SENT"
-    p "UNREAD DATA: #{socket.unreadData}"
+    p socket
   end
 
   def onSocket(socket, willDisconnectWithError: error)
-    p "ERROR: #{error.localizedDescription}"
+    p socket
   end
 
   def load_picker
@@ -371,7 +371,9 @@ class EventController < DialTestController
 
     stop_updates
 
-    self.tabBarController.tabBar.hidden = false
+    if self.tabBarController
+      self.tabBarController.tabBar.hidden = false
+    end
   end
 
   def turn_right_button(switch)

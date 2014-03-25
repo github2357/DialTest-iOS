@@ -186,7 +186,7 @@ class LoginController < DialTestController
     AFMotion::Client.shared.post("sessions", data ) do |result|
       if result.success?
         NSUserDefaults.standardUserDefaults["current_user"] = result.object
-        window.rootViewController = delegate.events_nav_controller
+        window.rootViewController = delegate.tab_controller
         SVProgressHUD.dismiss
       else
         SVProgressHUD.dismiss

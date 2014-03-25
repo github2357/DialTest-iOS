@@ -1,6 +1,17 @@
 class EventsTableController < DialTestController
   attr_accessor :callbacks
 
+  def initWithNibName(name, bundle: bundle)
+    super
+    self.tabBarItem = UITabBarItem.alloc.initWithTitle("My Account",
+                        image: UIImage.imageNamed("event_calendar.png"),
+                        tag: 2
+                      )
+
+    self.tabBarItem.setTitleTextAttributes({UITextAttributeTextColor => UIColor.blackColor}, forState:UIControlStateSelected)
+    self
+  end
+
   def viewDidLoad
     self.title = "Events"
 
@@ -9,11 +20,11 @@ class EventsTableController < DialTestController
     control_view.addSubview(control)
     self.navigationItem.titleView = control_view
 
-    new_button = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAdd, target:self, action: 'new_event')
-    self.navigationItem.rightBarButtonItem = new_button
+    search_button = UIBarButtonItem.alloc.initWithImage(UIImage.imageNamed("search_icon.png"), style: UIBarButtonItemStyleBordered, target:self, action: 'display_search')
+    self.navigationItem.rightBarButtonItem = search_button
 
-    settings_button = UIBarButtonItem.alloc.initWithImage(UIImage.imageNamed("profile_icon.png"), style: UIBarButtonItemStyleBordered, target:self, action:'settings')
-    self.navigationItem.leftBarButtonItem = settings_button
+    new_button = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAdd, target:self, action: 'new_event')
+    self.navigationItem.leftBarButtonItem = new_button
 
     @data = []
     @callbacks = {}
@@ -196,15 +207,6 @@ class EventsTableController < DialTestController
     end
   end
 
-  def settings
-    controller = SettingsController.alloc.initWithNibName(nil, bundle:nil)
-    self.presentViewController(
-      UINavigationController.alloc.initWithRootViewController(controller),
-      animated:true,
-      completion: lambda {}
-    )
-  end
-
   def reset_page_variables
     @all_events_page = 1
     @my_events_page  = 1
@@ -226,6 +228,15 @@ class EventsTableController < DialTestController
     else
       false
     end
+  end
+
+  def display_search
+    controller = SearchController.alloc.initWithNibName(nil, bundle:nil)
+    self.presentViewController(
+      UINavigationController.alloc.initWithRootViewController(controller),
+      animated:true,
+      completion: lambda {}
+    )
   end
 
 end

@@ -3,14 +3,22 @@ class SettingsController < DialTestController
 
   NON_DISPLAY_KEYS = %w(id api_token facebook_profile)
 
+  def initWithNibName(name, bundle: bundle)
+    super
+    self.tabBarItem = UITabBarItem.alloc.initWithTitle("My Account",
+                        image: UIImage.imageNamed("profile_icon.png"),
+                        tag: 2
+                      )
+
+    self.tabBarItem.setTitleTextAttributes({UITextAttributeTextColor => UIColor.blackColor}, forState:UIControlStateSelected)
+    self
+  end
+
   def viewDidLoad
     super
 
     self.title = "My Account"
     self.view.backgroundColor = UIColor.whiteColor
-
-    cancel_button = UIBarButtonItem.alloc.initWithTitle("Cancel", style: UIBarButtonItemStyleBordered, target:self, action:'cancel')
-    self.navigationItem.leftBarButtonItem = cancel_button
 
     self.view.addSubview(table)
   end
@@ -19,7 +27,7 @@ class SettingsController < DialTestController
     @fb_logout_button ||= FBLoginView.alloc.initWithReadPermissions(LoginController::DESIRED_FB_ATTRIBUTES).tap do |button|
       button.frame = [
         [(235 - (self.view.frame.size.width / 2)) / 2, 0],
-        [235, 46]
+        [235, 45]
       ]
       button.layer.borderColor = UIColor.colorWithRed(59.0/255.0, green: 87.0/255.0, blue: 157.0/255.0, alpha: 1.0)
       button.delegate = self
@@ -34,7 +42,7 @@ class SettingsController < DialTestController
       button.sizeToFit
       button.frame = [
         [(235 - (self.view.frame.size.width / 2)) / 2, 0],
-        [235, 46]
+        [235, 45]
       ]
       button.layer.cornerRadius = 2.0
       button.autoresizingMask =
@@ -138,7 +146,7 @@ class SettingsController < DialTestController
   end
 
   def logout
-    self.dismissViewControllerAnimated(true, completion:lambda {reset_root})
+    reset_root
   end
 
   def reset_root
