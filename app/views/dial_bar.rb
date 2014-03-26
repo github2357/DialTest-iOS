@@ -18,16 +18,8 @@ class DialBar < UIView
     add_arrows
     touch = touches.anyObject
     location = touch.locationInView(parent.view)
-    if location.y < 64.0
-      location.y = 64.0
-    elsif location.y > (parent.frame.size.height - 40)
-      location.y = parent.frame.size.height - 40
-    end
 
-    UIView.beginAnimations("Dragging A DraggableView", context:nil)
-    self.frame = CGRectMake(self.frame.origin.x, location.y,
-                            self.frame.size.width, self.frame.size.height)
-    UIView.commitAnimations
+    parent.animate_bar(location.y, self)
   end
 
   def touchesEnded(touches, withEvent: event)

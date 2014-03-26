@@ -25,9 +25,11 @@ class EventController < DialTestController
 
     @tilt_manager = CMMotionManager.alloc.init
 
-    @draggable = false
+    switch_to_drag
 
-    determine_right_nav_button
+    self.view.userInteractionEnabled = true
+    recognizer = UITapGestureRecognizer.alloc.initWithTarget(self, action: nil)
+    self.view.addGestureRecognizer(recognizer)
   end
 
   def viewWillAppear(animated)
@@ -39,25 +41,21 @@ class EventController < DialTestController
   end
 
   def reconnect
-    @socket = AsyncSocket.alloc.initWithDelegate(self)
-    @socket.connectToHost("#{RMENV['host']}", onPort:"#{RMENV['socket_port']}", error:nil)
-    @socket.delegate  = self
+    @socket = GCDAsyncSocket.alloc.initWithDelegate(self, delegateQueue: Dispatch::Queue.main.dispatch_object)
+    error = Pointer.new(:object)
+    @socket.connectToHost("#{RMENV['host']}", onPort:"#{RMENV['socket_port']}", error: error)
   end
 
   def onSocketWillConnect(socket)
     p socket
   end
 
-  def onSocket(socket, didConnectToHost: host, port: port)
-    p socket
+  def socket(socket, didConnectToHost: host, port: port)
+    p socket.isConnected
   end
 
-  def onSocket(socket, didWriteDataWithTag: tag)
-    p socket
-  end
-
-  def onSocket(socket, willDisconnectWithError: error)
-    p socket
+  def socketDidDisconnect(socket, withError: error)
+    p error.localizedDescription
   end
 
   def load_picker
@@ -250,7 +248,7 @@ class EventController < DialTestController
     if paused_alert_showing?
       turn_right_button("on")
       paused_alert.removeFromSuperview
-      start_updates
+      # start_updates
     else
       turn_right_button("off")
       stop_updates
@@ -350,7 +348,7 @@ class EventController < DialTestController
 
   def switch_to_drag
     @draggable = true
-    determine_right_nav_button
+    # determine_right_nav_button
     stop_updates
   end
 
@@ -367,7 +365,7 @@ class EventController < DialTestController
   end
 
   def viewWillDisappear(animated)
-    @socket.close
+    disconnect_socket
 
     stop_updates
 
@@ -379,10 +377,38 @@ class EventController < DialTestController
   def turn_right_button(switch)
     case switch
     when "on"
-      self.navigationItem.rightBarButtonItem.enabled = true
+      # self.navigationItem.rightBarButtonItem.enabled = true
     when "off"
-      self.navigationItem.rightBarButtonItem.enabled = false
+      # self.navigationItem.rightBarButtonItem.enabled = false
     end
+  end
+
+  def disconnect_socket
+    @socket.delegate = nil
+    @socket.disconnect
+  end
+
+  def touchesBegan(touches, withEvent: event)
+    touch = touches.anyObject
+    location = touch.locationInView(self.view)
+
+    value = ((location.y - height) / divider_height).round
+
+    submit_feedback("#{array[value][1]}", Time.now, Time.now.zone)
+    animate_bar(location.y, self.view)
+  end
+
+  def animate_bar(y_location, view)
+    if y_location < 64.0
+      y_location = 64.0
+    elsif y_location > (self.view.frame.size.height - 40)
+      y_location = self.view.frame.size.height - 40
+    end
+
+    UIView.beginAnimations("Dragging A DraggableView", context:nil)
+    bar.frame = CGRectMake(view.frame.origin.x, y_location,
+                            self.view.frame.size.width, view.frame.size.height)
+    UIView.commitAnimations
   end
 
 end
